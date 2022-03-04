@@ -1,0 +1,105 @@
+.p-datatable .p-datatable-header {
+  background: #fff !important;
+  border: none !important;
+}
+
+//.p-datatable thead th:nth-child(2),
+//.p-datatable tbody td:nth-child(2),
+//.p-datatable tfoot td:nth-child(2) {
+//  width: 50px;
+//}
+.p-datatable thead th,
+.p-datatable tbody td,
+.p-datatable tfoot td {
+  text-align: center !important;
+}
+
+.p-datatable table {
+  table-layout: auto !important;
+}
+.p-datatable .p-datatable-thead > tr > th {
+  background: linear-gradient(126deg, #d5dbe0, rgb(182 191 197 / 70%)) !important;
+}
+.p-datatable .p-sortable-column.p-highlight:hover, .p-datatable .p-sortable-column.p-highlight  {
+  color: #545b62 !important;
+}
+.p-focus,.p-inputtext:enabled:focus,.p-datatable .p-sortable-column:focus{
+  box-shadow: none !important;
+}
+:focus{
+  box-shadow: none !important;
+}
+.p-datatable.p-datatable-sm .p-datatable-tbody > tr > td {
+  padding: 2px 5px !important;
+}
+.p-component-overlay {
+  background-color: rgb(255 255 255 / 40%) !important;
+  transition-duration: 0.1s !important;
+}
+.p-paginator {
+  .p-paginator-current {
+    margin-left: auto !important;
+  }
+}
+.p-paginator .p-paginator-pages .p-paginator-page.p-highlight {
+  background: linear-gradient(126deg, #d5dbe0, rgb(182 191 197 / 70%)) !important;
+  color: #131111 !important;
+}
+
+.table-header {
+  display: flex !important;
+  justify-content: space-between !important;
+}
+
+.p-datatable.p-datatable-customers {
+  .p-datatable-header {
+    padding: 1rem !important;
+    text-align: center !important;
+    font-size: 1.5rem !important;
+  }
+
+  .p-paginator {
+    padding: 1rem !important;
+  }
+
+  .p-datatable-thead > tr > th {
+    text-align: center !important;
+  }
+
+  .p-datatable-tbody > tr > td {
+    cursor: auto !important;
+  }
+
+}
+
+/* Responsive */
+.p-datatable-customers .p-datatable-tbody > tr > td .p-column-title {
+  display: none !important;
+}
+
+@media screen and (max-width: 64em) {
+  .p-datatable {
+    &.p-datatable-customers {
+      .p-datatable-thead > tr > th,
+      .p-datatable-tfoot > tr > td {
+        display: none !important;
+      }
+
+      .p-datatable-tbody > tr > td {
+        display: block;
+        width: 100% !important;
+        float: left;
+        clear: left;
+        border: 0 none;
+
+        .p-column-title {
+          padding: .4rem;
+          min-width: 30%;
+          display: inline-block;
+          margin: -.4rem 1rem -.4rem -.4rem;
+          font-weight: bold;
+        }
+      }
+    }
+  }
+}
