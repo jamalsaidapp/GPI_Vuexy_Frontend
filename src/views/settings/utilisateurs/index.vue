@@ -82,13 +82,13 @@
 
 <script>
 import { BCard, BButton } from 'bootstrap-vue'
-import CustomCols from "@/views/settings/utilisateurs/components/CustomCols";
+import CustomCols from "./components/CustomCols";
 import JDatatable from "@/myCompenents/JDatatable";
 import {mapGetters} from "vuex";
 import store from "@/store";
 import ToastificationContent from "@core/components/toastification/ToastificationContent";
-import UserModal from "@/views/settings/utilisateurs/components/UserModal";
-import UserPermissionsModal from "@/views/settings/utilisateurs/components/UserPermissionsModal";
+import UserModal from "./components/UserModal";
+import UserPermissionsModal from "./components/UserPermissionsModal";
 
 export default {
   name: "index",

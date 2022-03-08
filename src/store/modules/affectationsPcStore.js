@@ -1,4 +1,4 @@
-import axios from '@axios'
+import axios from '@/libs/axios'
 
 export default {
     namespaced: true,
@@ -62,9 +62,10 @@ export default {
                     .catch(error => reject(error))
             })
         },
-        deleteAffectation({ dispatch }, id) {
+        deleteAffectation({ dispatch }, data) {
+            const { pivot } =  data
             return new Promise((resolve, reject) => {
-                axios.delete(`api/affectations/${id}`)
+                axios.delete(`api/affectations/${pivot.salarie_id}`,{data: pivot})
                     .then(res => {
                         resolve(res)
                         if (res.data.msg) dispatch('fetchAffectations')

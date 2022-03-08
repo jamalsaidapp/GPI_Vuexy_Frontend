@@ -27,6 +27,7 @@
           variant="gradient-danger"
           class="btn-icon rounded-circle fixpos"
           size="sm"
+          @click="DeleteAffectation(ordinateur)"
       >
         <feather-icon icon="Trash2Icon"/>
       </b-button>
@@ -37,8 +38,10 @@
 
 <script>
 import {BListGroup, BListGroupItem,BButton} from "bootstrap-vue";
+import store from "@/store";
 
 export default {
+  emit: 'update-affectation-modal-sync',
   name: 'ListOrdinateurAffecter',
   components:{
     BListGroup,
@@ -59,6 +62,25 @@ export default {
     OpenUpdateAffectationModal(affectation) {
       this.$root.$emit('update-affectation-modal-sync', affectation)
     },
+    DeleteAffectation(data){
+      this.$swal({
+        title: 'Are you sure?',
+        text: "You won't be able to revert this!",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Yes, delete it!',
+        customClass: {
+          confirmButton: 'btn btn-primary',
+          cancelButton: 'btn btn-outline-danger ml-1',
+        },
+        buttonsStyling: false,
+      }).then(result => {
+        if (result.value) {
+          store.dispatch('affectationsPcStore/deleteAffectation', data)
+        }
+      })
+
+    }
 
   }
 }

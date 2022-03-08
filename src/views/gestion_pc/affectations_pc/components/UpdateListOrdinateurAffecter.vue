@@ -5,7 +5,7 @@
         v-model="ModalSync"
         :title="title"
         centered
-        :ok-title="form.id ? 'Modifier' : 'Ajouter'"
+        ok-title=" Modifier "
         cancel-title="Férmer"
         button-size="sm"
         no-close-on-backdrop
@@ -99,7 +99,16 @@
 
 <script>
 import flatPickr from 'vue-flatpickr-component'
-import {BCol, BForm, BFormGroup, BFormInput, BInputGroup, BInputGroupAppend, BModal, BRow} from "bootstrap-vue";
+import {
+  BCol,
+  BForm,
+  BFormGroup,
+  BFormInput,
+  BInputGroup,
+  BInputGroupAppend,
+  BModal,
+  BRow,
+} from "bootstrap-vue";
 import vSelect from "vue-select";
 import {HasError} from "vform/src/components/bootstrap5";
 import ToastificationContent from "@core/components/toastification/ToastificationContent";
@@ -122,7 +131,8 @@ export default {
     // eslint-disable-next-line vue/no-unused-components
     ToastificationContent,
     flatPickr,
-  },
+  }
+  ,
   data() {
     return {
       ModalSync: false,
@@ -136,7 +146,8 @@ export default {
       Salaries: [],
       Ordinateurs: [],
     }
-  },
+  }
+  ,
   computed: {
     filteredSalaries() {
       return [
@@ -147,33 +158,42 @@ export default {
         }
       ];
     }
-  },
+  }
+  ,
   created() {
-    this.$root.$on('affectation-modal-sync', affectation => {
+    this.$root.$on('update-affectation-modal-sync', affectation => {
       this.ModalSync = !this.ModalSync
       this.form.clear()
       this.form.reset()
-      this.title = 'Ajouter Une Affectation'
+      this.title = '☑️ Créer Par : '+ affectation.pivot.created_by
       if (affectation) {
-        // this.form.fill(affectation)
+        this.form.fill({
+          salarie_id: affectation.pivot.salarie_id,
+          ordinateur_id: affectation.pivot.ordinateur_id,
+          affected_at: affectation.affected_at,
+          remarque: affectation.remarque,
+        })
         // this.title = 'Modification : '
         console.log(affectation)
       }
       this.LoadSalaries()
     })
-  },
+  }
+  ,
   methods: {
     LoadSalaries() {
       store.dispatch('salariesStore/get_SN_Salaries').then(res => {
         this.Salaries = res.data.salaries
         this.Ordinateurs = res.data.ordinateurs
       })
-    },
+    }
+    ,
     submit(bvModalEvt) {
       bvModalEvt.preventDefault()
       // eslint-disable-next-line no-unused-expressions
       this.form.id ? this.editAffectation() : this.addAffectation()
-    },
+    }
+    ,
     addAffectation() {
       store.dispatch('affectationsPcStore/addAffectation', this.form).then(res => {
         this.$nextTick(() => {
@@ -183,7 +203,8 @@ export default {
           }
         })
       })
-    },
+    }
+    ,
     editAffectation() {
       store.dispatch('affectationsPcStore/editAffectation', this.form).then(res => {
         this.$nextTick(() => {
@@ -193,19 +214,24 @@ export default {
           }
         })
       })
-    },
+    }
+    ,
     getSuggestionValue(suggestion) {
       return suggestion.item.full_name;
-    },
+    }
+    ,
     onSelected(option) {
       if (this.form.salarie_id) this.form.salarie_id = option.id
-    },
+    }
+    ,
     clearFormError(field) {
       this.form.errors.clear(field)
-    },
+    }
+    ,
     handleState(field) {
       return this.form.errors.has(field) ? false : null
-    },
+    }
+    ,
     toastNotification(text, icon, variant) {
       this.$toast({
             component: ToastificationContent,
@@ -219,10 +245,13 @@ export default {
             position: 'top-center',
           })
     },
+    NextTab(props) {
+      props.nextTab()
+      this.form.fill()
+    }
+    ,
   }
 }
 </script>
 
-<style lang="scss">
-@import '@core/scss/vue/libs/vue-flatpicker.scss';
-</style>
+

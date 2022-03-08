@@ -48,9 +48,9 @@ import {mapGetters} from "vuex"
 import store from "@/store"
 import JDatatable from "@/myCompenents/JDatatable"
 import {BButton, BCard, BListGroup, BListGroupItem, BTooltip} from "bootstrap-vue"
-import AffectationModal from "@/views/gestion_pc/affectations_pc/AffectationModal"
-import ListOrdinateurAffecter from "@/views/gestion_pc/affectations_pc/ListOrdinateurAffecter"
-import UpdateListOrdinateurAffecter from "@/views/gestion_pc/affectations_pc/UpdateListOrdinateurAffecter"
+import AffectationModal from "./components/AffectationModal"
+import ListOrdinateurAffecter from "./components/ListOrdinateurAffecter"
+import UpdateListOrdinateurAffecter from "./components/UpdateListOrdinateurAffecter"
 
 export default {
   name: 'Update_Affectations_table',
@@ -114,6 +114,6 @@ export default {
 }
 </script>
 
-<style scoped>
-
+<style lang="scss">
+@import '@core/scss/vue/libs/vue-flatpicker.scss';
 </style>

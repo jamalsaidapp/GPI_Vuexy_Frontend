@@ -183,9 +183,10 @@ export default {
           this.isLogin = false
         })
         .catch(error => {
+          if (error) {
+            this.error = error.response.data.message
+          }
           this.isLogin = false
-          if (error)
-          this.error = error.response.data.message
         })
     },
     clearFormError(field) {

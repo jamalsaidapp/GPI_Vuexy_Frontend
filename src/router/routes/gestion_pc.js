@@ -17,7 +17,7 @@ export default [
     {
         path: '/gestion_pc/affectations_pc/',
         name: 'affectations_pc',
-        component: () => import('@/views/gestion_pc/affectations_pc/Affectations_Pc.vue'),
+        component: () => import('@/views/gestion_pc/affectations_pc'),
         meta: {
             resource: 'affectations_pc',
             pageTitle: 'Gestion PC',
