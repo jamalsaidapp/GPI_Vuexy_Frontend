@@ -1,93 +1,94 @@
 <template>
   <div>
     <b-modal
-        ref="AffectationModal"
-        v-model="ModalSync"
-        :title="title"
-        centered
-        :ok-title="form.id ? 'Modifier' : 'Ajouter'"
-        cancel-title="Férmer"
-        button-size="sm"
-        no-close-on-backdrop
-        @ok="submit"
+      ref="AffectationModal"
+      v-model="ModalSync"
+      :title="title"
+      centered
+      :ok-title="form.id ? 'Modifier' : 'Ajouter'"
+      cancel-title="Férmer"
+      button-size="sm"
+      no-close-on-backdrop
+      @ok="submit"
     >
       <b-form @submit.prevent>
         <b-row class="mt-1">
           <b-col md="6">
             <b-form-group
-                label="Nom Complete"
-                label-for="salarie_id"
+              label="Nom Complete"
+              label-for="salarie_id"
             >
               <v-select
-                  v-model="form.salarie_id"
-                  input-id="salarie_id"
-                  placeholder="choisir ..."
-                  label="full_name"
-                  :reduce="item => item.id"
-                  :options="Salaries"
-                  class="select-size-sm"
-                  @input="clearFormError('salarie_id')"
+                v-model="form.salarie_id"
+                input-id="salarie_id"
+                placeholder="choisir ..."
+                label="full_name"
+                :reduce="item => item.id"
+                :options="Salaries"
+                class="select-size-sm"
+                @input="clearFormError('salarie_id')"
               />
               <HasError
-                  :form="form"
-                  field="salarie_id"
+                :form="form"
+                field="salarie_id"
               />
             </b-form-group>
           </b-col>
           <b-col md="6">
             <b-form-group
-                label="Numéro de Série d'ordinateur"
-                label-for="ordinateur_id"
+              label="Numéro de Série d'ordinateur"
+              label-for="ordinateur_id"
             >
               <v-select
-                  v-model="form.ordinateur_id"
-                  input-id="sn"
-                  placeholder="choisir ..."
-                  label="sn"
-                  :reduce="item => item.id"
-                  :options="Ordinateurs"
-                  class="select-size-sm"
-                  @input="clearFormError('ordinateur_id')"
+                v-model="form.ordinateur_id"
+                input-id="sn"
+                placeholder="choisir ..."
+                label="sn"
+                :reduce="item => item.id"
+                :selectable="option => option.affecter === 'Non'"
+                :options="Ordinateurs"
+                class="select-size-sm"
+                @input="clearFormError('ordinateur_id')"
               />
               <HasError
-                  :form="form"
-                  field="ordinateur_id"
+                :form="form"
+                field="ordinateur_id"
               />
             </b-form-group>
           </b-col>
           <b-col md="6">
             <b-form-group
-                label="Date d'affectation"
-                label-for="affected_at"
+              label="Date d'affectation"
+              label-for="affected_at"
             >
               <flat-pickr
-                  v-model="form.affected_at"
-                  class="form-control form-control-sm"
-                  placeholder="choisir ..."
-                  :config="{dateFormat: 'd/m/Y'}"
-                  @input="clearFormError('affected_at')"
+                v-model="form.affected_at"
+                class="form-control form-control-sm"
+                placeholder="choisir ..."
+                :config="{dateFormat: 'Y/m/d'}"
+                @input="clearFormError('affected_at')"
               />
               <HasError
-                  :form="form"
-                  field="affected_at"
+                :form="form"
+                field="affected_at"
               />
             </b-form-group>
           </b-col>
           <b-col md="6">
             <b-form-group
-                label="Remarque"
-                label-for="remarque"
+              label="Remarque"
+              label-for="remarque"
             >
               <b-form-input
-                  id="remarque"
-                  v-model="form.remarque"
-                  size="sm"
-                  placeholder="......"
-                  @input="clearFormError('remarque')"
+                id="remarque"
+                v-model="form.remarque"
+                size="sm"
+                placeholder="......"
+                @input="clearFormError('remarque')"
               />
               <HasError
-                  :form="form"
-                  field="remarque"
+                :form="form"
+                field="remarque"
               />
             </b-form-group>
           </b-col>
@@ -99,12 +100,15 @@
 
 <script>
 import flatPickr from 'vue-flatpickr-component'
-import {BCol, BForm, BFormGroup, BFormInput, BInputGroup, BInputGroupAppend, BModal, BRow} from "bootstrap-vue";
-import vSelect from "vue-select";
-import {HasError} from "vform/src/components/bootstrap5";
-import ToastificationContent from "@core/components/toastification/ToastificationContent";
-import Form from "vform";
-import store from "@/store";
+import {
+  BCol, BForm, BFormGroup, BFormInput, BModal, BRow,
+} from 'bootstrap-vue'
+import vSelect from 'vue-select'
+import { HasError } from 'vform/src/components/bootstrap5'
+import ToastificationContent from '@core/components/toastification/ToastificationContent'
+import Form from 'vform'
+import store from '@/store'
+import { mapGetters } from 'vuex'
 
 export default {
   name: 'AffectationModal',
@@ -114,8 +118,6 @@ export default {
     BRow,
     BCol,
     BFormGroup,
-    BInputGroupAppend,
-    BInputGroup,
     BFormInput,
     vSelect,
     HasError,
@@ -133,41 +135,35 @@ export default {
         affected_at: '',
         remarque: '',
       }),
-      Salaries: [],
-      Ordinateurs: [],
     }
   },
   computed: {
     filteredSalaries() {
       return [
         {
-          data: this.Salaries.data?.filter(option => {
-            return option.full_name?.toLowerCase().includes(this.form.full_name?.toLowerCase());
-          })
-        }
-      ];
-    }
+          data: this.Salaries.data?.filter(option => option.full_name?.toLowerCase()
+            .includes(this.form.full_name?.toLowerCase())),
+        },
+      ]
+    },
+    ...mapGetters({
+      Salaries: 'salariesStore/getSalaries',
+      Ordinateurs: 'ordinateursStore/getOrdinateurs',
+    }),
   },
   created() {
-    this.$root.$on('affectation-modal-sync', affectation => {
+    this.$root.$on('affectation-modal-trigger', () => {
+      this.LoadData()
       this.ModalSync = !this.ModalSync
       this.form.clear()
       this.form.reset()
       this.title = 'Ajouter Une Affectation'
-      if (affectation) {
-        // this.form.fill(affectation)
-        // this.title = 'Modification : '
-        console.log(affectation)
-      }
-      this.LoadSalaries()
     })
   },
   methods: {
-    LoadSalaries() {
-      store.dispatch('salariesStore/get_SN_Salaries').then(res => {
-        this.Salaries = res.data.salaries
-        this.Ordinateurs = res.data.ordinateurs
-      })
+    LoadData() {
+      if (this.Salaries.length === 0) store.dispatch('salariesStore/fetchSalaries')
+      if (this.Ordinateurs.length === 0) store.dispatch('ordinateursStore/fetchOrdinateurs')
     },
     submit(bvModalEvt) {
       bvModalEvt.preventDefault()
@@ -195,7 +191,7 @@ export default {
       })
     },
     getSuggestionValue(suggestion) {
-      return suggestion.item.full_name;
+      return suggestion.item.full_name
     },
     onSelected(option) {
       if (this.form.salarie_id) this.form.salarie_id = option.id
@@ -208,19 +204,17 @@ export default {
     },
     toastNotification(text, icon, variant) {
       this.$toast({
-            component: ToastificationContent,
-            props: {
-              text,
-              icon: `${icon}Icon`,
-              variant,
-            },
-          },
-          {
-            position: 'top-center',
-          })
+        component: ToastificationContent,
+        props: {
+          text,
+          icon: `${icon}Icon`,
+          variant,
+        },
+      },
+      {
+        position: 'top-center',
+      })
     },
-  }
+  },
 }
 </script>
-
-

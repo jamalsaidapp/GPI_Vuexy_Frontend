@@ -57,7 +57,7 @@ router.beforeEach((to, _, next) => {
   }
 
   if (to.meta.redirectIfLoggedIn && isLoggedIn) {
-    const userData = getUserData()
+    // const userData = getUserData()
     // return next(getHomeRouteForLoggedInUser(userData ? userData.role : null))
     return next({ name: 'dashboard' })
   }
@@ -73,7 +73,7 @@ router.afterEach(() => {
   if (appLoading) {
     appLoading.style.display = 'none'
   }
-  console.clear()
+  // console.clear()
 })
 
 export default router

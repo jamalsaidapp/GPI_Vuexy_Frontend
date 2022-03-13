@@ -1,66 +1,68 @@
 <template>
   <div>
     <b-card
-        no-body
-        class="p-1"
+      no-body
+      class="p-1"
     >
       <JDatatable
-          table-name="Affectation"
-          :table-data="affectations"
-          :selected-rows="selectedRows"
-          :columns="columns"
-          :isloading="loading"
-          has-expansion
-          data-key="sn"
-          :has-actions="false"
+        table-name="Affectation"
+        :table-data="affectations"
+        :selected-rows="selectedRows"
+        :columns="columns"
+        :isloading="loading"
+        has-expansion
+        data-key="sn"
+        :has-actions="false"
       >
         <template #action_table>
           <b-button
-              variant="gradient-secondary"
-              class="btn-icon rounded-circle mr-1"
-              size="sm"
-              @click="fetchAffectations"
+            variant="gradient-secondary"
+            class="btn-icon rounded-circle mr-1"
+            size="sm"
+            @click="fetchAffectations"
           >
-            <feather-icon icon="RefreshCwIcon"/>
+            <feather-icon icon="RefreshCwIcon" />
           </b-button>
           <b-button
-              variant="gradient-primary"
-              class="btn-icon rounded-circle"
-              size="sm"
-              @click="OpenAffectationModal(null)"
+            variant="gradient-primary"
+            class="btn-icon rounded-circle"
+            size="sm"
+            @click="OpenAffectationModal(null)"
           >
-            <feather-icon icon="PlusIcon"/>
+            <feather-icon icon="PlusIcon" />
           </b-button>
         </template>
 
-        <template class="ml-auto" v-slot:expand="props">
-          <ListOrdinateurAffecter :ordinateurs="props.props.ordinateur"/>
+        <template
+          v-slot:expand="props"
+          class="ml-auto"
+        >
+          <ListOrdinateurAffecter :ordinateurs="props.props.ordinateur" />
         </template>
       </JDatatable>
     </b-card>
-    <AffectationModal/>
-    <UpdateListOrdinateurAffecter/>
+    <AffectationModal />
+    <UpdateListOrdinateurAffecter />
   </div>
 </template>
 
 <script>
-import {mapGetters} from "vuex"
-import store from "@/store"
-import JDatatable from "@/myCompenents/JDatatable"
-import {BButton, BCard, BListGroup, BListGroupItem, BTooltip} from "bootstrap-vue"
-import AffectationModal from "./components/AffectationModal"
-import ListOrdinateurAffecter from "./components/ListOrdinateurAffecter"
-import UpdateListOrdinateurAffecter from "./components/UpdateListOrdinateurAffecter"
+import { mapGetters } from 'vuex'
+import store from '@/store'
+import JDatatable from '@/myCompenents/JDatatable'
+import {
+  BButton, BCard,
+} from 'bootstrap-vue'
+import AffectationModal from './components/AffectationModal'
+import ListOrdinateurAffecter from './components/ListOrdinateurAffecter'
+import UpdateListOrdinateurAffecter from './components/UpdateListOrdinateurAffecter'
 
 export default {
-  name: 'Update_Affectations_table',
+  name: 'UpdateAffectationsTable',
   components: {
     JDatatable,
     BButton,
     BCard,
-    BListGroup,
-    BListGroupItem,
-    BTooltip,
     ListOrdinateurAffecter,
     AffectationModal,
     UpdateListOrdinateurAffecter,
@@ -104,10 +106,7 @@ export default {
     },
 
     OpenAffectationModal(affectation) {
-      this.$root.$emit('affectation-modal-sync', affectation)
-    },
-    OpenUpdateAffectationModal(affectation) {
-      this.$root.$emit('update-affectation-modal-sync', affectation)
+      this.$root.$emit('affectation-modal-trigger', affectation)
     },
 
   },
