@@ -55,8 +55,7 @@ import { BListGroup, BListGroupItem, BButton } from 'bootstrap-vue'
 import store from '@/store'
 
 export default {
-  emit: 'update-affectation-modal-sync',
-  name: 'ListOrdinateurAffecter',
+  name: 'ListOrdinateurRendu',
   components: {
     BListGroup,
     BListGroupItem,

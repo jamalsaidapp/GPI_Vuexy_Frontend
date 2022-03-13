@@ -64,9 +64,7 @@
             <small
               v-if="form.errors.has('password')"
               class="text-danger"
-            >{{
-              form.errors.get("password")
-            }}</small>
+            >{{ form.errors.get("password") }}</small>
           </b-form-group>
 
           <!-- checkbox -->
@@ -118,11 +116,8 @@ import {
 import useJwt from '@/auth/jwt/useJwt'
 import { togglePasswordVisibility } from '@core/mixins/ui/forms'
 import store from '@/store/index'
-import { getHomeRouteForLoggedInUser } from '@/auth/utils'
 import Form from 'vform'
 // import { initialAbility } from '@/libs/acl/config'
-
-
 
 // const R = require('ramda')
 // :state="errors.length > 0 ? false:null"
