@@ -39,17 +39,6 @@
               label="Numéro de Série d'ordinateur"
               label-for="ordinateur_id"
             >
-              <!--              <v-select
-                v-model="form.ordinateur_id"
-                input-id="sn"
-                placeholder="choisir ..."
-                label="sn"
-                :reduce="item => item.id"
-                :selectable="option => option.affecter === 'Non'"
-                :options="ordinateurs"
-                class="select-size-sm"
-                @input="clearFormError('ordinateur_id')"
-              />-->
               <b-form-input
                 id="sn"
                 :value="form.sn"
@@ -60,6 +49,42 @@
               <HasError
                 :form="form"
                 field="ordinateur_id"
+              />
+            </b-form-group>
+          </b-col>
+          <b-col md="6">
+            <b-form-group
+                label="Projet"
+                label-for="projet_id"
+            >
+              <v-select
+                  v-model="form.projet_id"
+                  input-id="projet_id"
+                  placeholder="choisir ..."
+                  label="name"
+                  :reduce="item => item.id"
+                  :options="Projets"
+                  class="select-size-sm"
+                  @input="clearFormError('projet_id')"
+                  @option:selected="detect_CP"
+              />
+              <HasError
+                  :form="form"
+                  field="projet_id"
+              />
+            </b-form-group>
+          </b-col>
+          <b-col md="6">
+            <b-form-group
+                label="Chef Projet"
+                label-for="cp"
+            >
+              <b-form-input
+                  id="cp"
+                  v-model="cp"
+                  size="sm"
+                  disabled
+                  placeholder="......"
               />
             </b-form-group>
           </b-col>
@@ -144,10 +169,12 @@ export default {
       form: new Form({
         salarie_id: null,
         ordinateur_id: null,
+        projet_id: null,
         affected_at: null,
         remarque: null,
         sn: null,
       }),
+      cp: null
     }
   },
   computed: {
@@ -162,6 +189,7 @@ export default {
     ...mapGetters({
       salaries: 'salariesStore/getSalaries',
       ordinateurs: 'ordinateursStore/getOrdinateurs',
+      Projets: 'projetsStore/getProjets',
     }),
   },
   created() {
@@ -175,10 +203,15 @@ export default {
         this.form.fill({
           salarie_id: affectation.pivot.salarie_id,
           ordinateur_id: affectation.pivot.ordinateur_id,
+          projet_id: affectation.pivot.projet_id,
           affected_at: affectation.pivot.affected_at,
           remarque: affectation.pivot.remarque,
           sn: affectation.sn,
         })
+        const pr = this.Projets.find(item => item.id === this.form.projet_id)
+        if (pr){
+          this.cp = pr.name
+        }
       }
     })
   },
@@ -186,6 +219,7 @@ export default {
     LoadData() {
       if (this.salaries.length === 0) store.dispatch('salariesStore/fetchSalaries')
       if (this.ordinateurs.length === 0) store.dispatch('ordinateursStore/fetchOrdinateurs')
+      if (this.Projets.length === 0) store.dispatch('projetsStore/fetchProjets')
     },
     submit(bvModalEvt) {
       bvModalEvt.preventDefault()
@@ -207,6 +241,9 @@ export default {
     },
     onSelected(option) {
       if (this.form.salarie_id) this.form.salarie_id = option.id
+    },
+    detect_CP(option){
+      this.cp = option.cp
     },
     clearFormError(field) {
       this.form.errors.clear(field)

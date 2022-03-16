@@ -19,6 +19,7 @@
         @row-expand="onRowExpand"
         @row-collapse="onRowCollapse"
         :row-class="hasDeletedFilter ? FilterDeletedRows : ''"
+        @row-click="rowClick"
     >
       <template #header>
         <div class="table-header mb-1">
@@ -28,7 +29,7 @@
                 <feather-icon icon="SearchIcon"/>
               </b-input-group-prepend>
               <b-form-input
-                  v-model="filters['global']"
+                  v-model.trim="filters['global']"
                   size="sm"
                   placeholder="Recherche..."
                   type="search"
@@ -271,6 +272,14 @@ export default {
     },
   },
   methods: {
+    rowClick(record) {
+      const OldRecordData = !!this.expandedRows?.length ? this.expandedRows[0] : null
+      this.expandedRows = []
+      this.expandedRows.push(record.data)
+      if (OldRecordData === record.data) {
+        this.expandedRows = []
+      }
+    },
     deleteAllFunction() {
       this.$emit('delete-all', R.pluck(this.DataKey)(this.selectedRows))
     },

@@ -38,6 +38,14 @@ const router = new VueRouter({
     ...helpdesk,
     ...gestion_pc,
     {
+      path: '/print-page',
+      name: 'print-page',
+      component: () => import('@/views/gestion_pc/print/index'),
+      meta: {
+        layout: 'full',
+      },
+    },
+    {
       path: '*',
       redirect: 'error-404',
     },

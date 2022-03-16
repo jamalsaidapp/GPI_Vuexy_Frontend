@@ -58,6 +58,42 @@
           </b-col>
           <b-col md="6">
             <b-form-group
+                label="Projet"
+                label-for="projet_id"
+            >
+              <v-select
+                  v-model="form.projet_id"
+                  input-id="projet_id"
+                  placeholder="choisir ..."
+                  label="name"
+                  :reduce="item => item.id"
+                  :options="Projets"
+                  class="select-size-sm"
+                  @input="clearFormError('projet_id')"
+                  @option:selected="detect_CP"
+              />
+              <HasError
+                  :form="form"
+                  field="projet_id"
+              />
+            </b-form-group>
+          </b-col>
+          <b-col md="6">
+            <b-form-group
+                label="Chef Projet"
+                label-for="cp"
+            >
+              <b-form-input
+                  id="cp"
+                  v-model="cp"
+                  size="sm"
+                  disabled
+                  placeholder="......"
+              />
+            </b-form-group>
+          </b-col>
+          <b-col md="6">
+            <b-form-group
               label="Date d'affectation"
               label-for="affected_at"
             >
@@ -132,9 +168,11 @@ export default {
       form: new Form({
         salarie_id: '',
         ordinateur_id: '',
+        projet_id: '',
         affected_at: '',
         remarque: '',
       }),
+      cp: ''
     }
   },
   computed: {
@@ -149,6 +187,7 @@ export default {
     ...mapGetters({
       Salaries: 'salariesStore/getSalaries',
       Ordinateurs: 'ordinateursStore/getOrdinateurs',
+      Projets: 'projetsStore/getProjets',
     }),
   },
   created() {
@@ -161,9 +200,11 @@ export default {
     })
   },
   methods: {
+
     LoadData() {
       if (this.Salaries.length === 0) store.dispatch('salariesStore/fetchSalaries')
       if (this.Ordinateurs.length === 0) store.dispatch('ordinateursStore/fetchOrdinateurs')
+      if (this.Projets.length === 0) store.dispatch('projetsStore/fetchProjets')
     },
     submit(bvModalEvt) {
       bvModalEvt.preventDefault()
@@ -195,6 +236,9 @@ export default {
     },
     onSelected(option) {
       if (this.form.salarie_id) this.form.salarie_id = option.id
+    },
+    detect_CP(option){
+      this.cp = option.cp
     },
     clearFormError(field) {
       this.form.errors.clear(field)

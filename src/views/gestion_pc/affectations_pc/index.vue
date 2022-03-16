@@ -12,7 +12,6 @@
         :isloading="loading"
         has-expansion
         data-key="sn"
-        :has-actions="false"
       >
         <template #action_table>
           <b-button
@@ -39,6 +38,17 @@
         >
           <ListOrdinateurAffecter :ordinateurs="props.props.ordinateur" />
         </template>
+
+        <template v-slot:actions_button="props">
+          <b-button
+              variant="gradient-primary"
+              class="btn-icon rounded-circle mr-1"
+              size="sm"
+              @click="print(props.props)"
+          >
+            <feather-icon icon="PrinterIcon"/>
+          </b-button>
+        </template>
       </JDatatable>
     </b-card>
     <AffectationModal />
@@ -56,6 +66,7 @@ import {
 import AffectationModal from './components/AffectationModal'
 import ListOrdinateurAffecter from './components/ListOrdinateurAffecter'
 import UpdateListOrdinateurAffecter from './components/UpdateListOrdinateurAffecter'
+import router from "@/router";
 
 export default {
   name: 'UpdateAffectationsTable',
@@ -82,12 +93,20 @@ export default {
           sortable: true,
         },
         {
+          field: 'projets',
+          header: 'Projets',
+          sortable: true,
+        },
+        {
           field: 'ordinateurs_count',
           header: 'Nombre du PC Affecter',
           sortable: true,
         },
       ],
       selectedRows: [],
+      transProps: {
+        name: 'flip-list'
+      },
     }
   },
   computed: {
@@ -108,7 +127,12 @@ export default {
     OpenAffectationModal(affectation) {
       this.$root.$emit('affectation-modal-trigger', affectation)
     },
-
+    print(data){
+      // let routeData = router.resolve({path: 'print-page'});
+      // console.log(routeData)
+      window.open('/print-page', '_blank');
+      console.log(data);
+    }
   },
 }
 </script>
@@ -116,3 +140,6 @@ export default {
 <style lang="scss">
 @import '@core/scss/vue/libs/vue-flatpicker.scss';
 </style>
+<style>
+
+

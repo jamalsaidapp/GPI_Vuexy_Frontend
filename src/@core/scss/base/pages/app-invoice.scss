@@ -157,10 +157,16 @@ $invoice-card-body-padding: 2.5rem;
       top: -1.5rem !important;
     }
   }
-  @media print {
-    hr {
-      margin-top: 1rem !important;
-      margin-bottom: 1rem !important;
-    }
-  }
+  //@media print {
+  //  hr {
+  //    margin-top: 1rem !important;
+  //    margin-bottom: 1rem !important;
+  //  }
+  //  table th,tr,td{
+  //    border: 1px solid #000 !important;
+  //  }
+  //  table hr{
+  //    border-top: 1px solid #000 !important;
+  //  }
+  //}
 }
