@@ -106,5 +106,9 @@ export default {
 </script>
 
 <style lang="scss">
-@import '@core/scss/vue/libs/vue-select.scss';
+.swal2-header.delete-header .swal2-icon {
+  margin: unset !important;
+  width: 3rem !important;
+  height: 3rem !important;
+}
 </style>

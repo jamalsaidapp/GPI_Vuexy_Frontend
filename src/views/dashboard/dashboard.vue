@@ -1,12 +1,26 @@
 <template>
-  <div>
-    user dashbord
-  </div>
+  <div>dashboard</div>
 </template>
 
 <script>
+
 export default {
-  name: 'Dashboard',
+  components: {
+  },
+  data() {
+    return {
+    }
+  },
+
+  created() {
+
+  },
+  mounted() {
+
+  },
+  methods: {
+
+  },
 }
 </script>
 

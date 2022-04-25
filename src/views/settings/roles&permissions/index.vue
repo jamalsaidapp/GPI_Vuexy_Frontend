@@ -2,16 +2,16 @@
   <div>
     <b-row>
       <b-col
-          lg="6"
-          md="12"
+        lg="6"
+        md="12"
       >
-        <roles/>
+        <roles />
       </b-col>
       <b-col
-          lg="6"
-          md="12"
+        lg="6"
+        md="12"
       >
-        <permissions/>
+        <permissions />
       </b-col>
     </b-row>
   </div>
@@ -21,11 +21,8 @@
 import {
   BRow, BCol,
 } from 'bootstrap-vue'
-import store from '@/store'
-import roles from './Roles/Roles.vue'
-import permissions from './Permissions/Permissions.vue'
-import app_permissionsModule from "@/views/settings/roles&permissions/Permissions/permissionsStoreModule";
-import app_rolesModule from "@/views/settings/roles&permissions/Roles/rolesStoreModule";
+import roles from './Roles/Roles'
+import permissions from './Permissions/Permissions'
 
 export default {
   name: 'RolesPermissions',
@@ -37,7 +34,6 @@ export default {
   },
   created() {
   },
-
 
 }
 </script>

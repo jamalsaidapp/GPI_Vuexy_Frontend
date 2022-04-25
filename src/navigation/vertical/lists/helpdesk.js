@@ -4,7 +4,7 @@ export default [
     icon: 'LifeBuoyIcon',
     children: [
       {
-        title: 'Mes Tickets',
+        title: 'Tickets',
         route: 'tickets',
         resource: 'helpdesk',
         action: 'read',

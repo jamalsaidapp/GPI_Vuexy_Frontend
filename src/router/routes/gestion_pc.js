@@ -2,7 +2,7 @@ export default [
   {
     path: '/gestion_pc/ordinateurs/',
     name: 'ordinateurs',
-    component: () => import('@/views/gestion_pc/ordinateurs/Ordinateurs'),
+    component: () => import('@/views/gestion_pc/ordinateurs'),
     meta: {
       resource: 'ordinateurs',
       pageTitle: 'Gestion PC',
@@ -42,6 +42,14 @@ export default [
           active: true,
         },
       ],
+    },
+  },
+  {
+    path: '/print-page',
+    name: 'print-page',
+    component: () => import('@/views/gestion_pc/print/index'),
+    meta: {
+      layout: 'full',
     },
   },
 ]

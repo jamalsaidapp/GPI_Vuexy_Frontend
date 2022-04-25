@@ -1,148 +1,147 @@
 <template>
   <div>
     <b-modal
-        ref="UserModal"
-        v-model="ModalSync"
-        :title="title"
-        centered
-        :ok-title="form.id ? 'Modifier' : 'Ajouter'"
-        cancel-title="Férmer"
-        button-size="sm"
-        no-close-on-backdrop
-        @ok="submit"
+      ref="UserModal"
+      v-model="ModalSync"
+      :title="title"
+      centered
+      :ok-title="form.id ? 'Modifier' : 'Ajouter'"
+      cancel-title="Férmer"
+      button-size="sm"
+      no-close-on-backdrop
+      @ok="submit"
     >
       <b-form @submit.prevent>
         <b-row class="mt-1">
           <b-col md="6">
             <b-form-group
-                label="Nom"
-                label-for="first_name"
+              label="Nom"
+              label-for="first_name"
             >
               <b-form-input
-                  ref="first_name"
-                  id="first_name"
-                  v-model="form.first_name"
-                  size="sm"
-                  placeholder="Tapper Nom"
-                  :state="handleState('first_name')"
-                  @input="clearFormError('first_name')"
+                id="first_name"
+                ref="first_name"
+                v-model="form.first_name"
+                size="sm"
+                placeholder="Tapper Nom"
+                :state="handleState('first_name')"
+                @input="form.errors.clear('first_name')"
               />
               <HasError
-                  :form="form"
-                  field="first_name"
+                :form="form"
+                field="first_name"
               />
             </b-form-group>
           </b-col>
           <b-col md="6">
             <b-form-group
-                label="Prénom"
-                label-for="last_name"
+              label="Prénom"
+              label-for="last_name"
             >
               <b-form-input
-                  id="last_name"
-                  v-model="form.last_name"
-                  size="sm"
-                  placeholder="Tapper Prénom"
-                  :state="handleState('last_name')"
-                  @input="clearFormError('last_name')"
+                id="last_name"
+                v-model="form.last_name"
+                size="sm"
+                placeholder="Tapper Prénom"
+                :state="handleState('last_name')"
+                @input="form.errors.clear('last_name')"
               />
               <HasError
-                  :form="form"
-                  field="last_name"
+                :form="form"
+                field="last_name"
               />
             </b-form-group>
           </b-col>
           <b-col md="6">
             <b-form-group
-                label="Email"
-                label-for="email"
+              label="Email"
+              label-for="email"
             >
               <b-form-input
-                  id="email"
-                  v-model="form.email"
-                  size="sm"
-                  placeholder="Tapper Email"
-                  :state="handleState('email')"
-                  @input="clearFormError('email')"
+                id="email"
+                v-model="form.email"
+                size="sm"
+                placeholder="Tapper Email"
+                :state="handleState('email')"
+                @input="form.errors.clear('email')"
               />
               <HasError
-                  :form="form"
-                  field="email"
+                :form="form"
+                field="email"
               />
             </b-form-group>
           </b-col>
           <b-col md="6">
             <b-form-group
-                label="Password"
-                label-for="password"
+              label="Password"
+              label-for="password"
             >
               <b-input-group
-                  class="input-group-merge"
-                  :class="{'is-invalid':form.errors.has('password')}"
+                class="input-group-merge"
+                :class="{'is-invalid':form.errors.has('password')}"
               >
                 <b-form-input
-                    id="password"
-                    v-model="form.password"
-                    :type="passwordFieldType"
-                    size="sm"
-                    placeholder="Tapper Password"
-                    :state="handleState('password')"
-                    @input="clearFormError('password')"
+                  id="password"
+                  v-model="form.password"
+                  :type="passwordFieldType"
+                  size="sm"
+                  placeholder="Tapper Password"
+                  :state="handleState('password')"
+                  @input="form.errors.clear('password')"
                 />
                 <b-input-group-append is-text>
                   <feather-icon
-                      :icon="passwordToggleIcon"
-                      class="cursor-pointer"
-                      @click="togglePasswordVisibility"
+                    :icon="passwordToggleIcon"
+                    class="cursor-pointer"
+                    @click="togglePasswordVisibility"
                   />
                 </b-input-group-append>
               </b-input-group>
               <HasError
-                  :form="form"
-                  field="password"
+                :form="form"
+                field="password"
               />
             </b-form-group>
           </b-col>
           <b-col md="6">
             <b-form-group
-                label="Role"
-                label-for="role"
+              label="Role"
+              label-for="role"
             >
               <v-select
-                  v-model="form.role"
-                  input-id="role"
-                  placeholder="choisir ..."
-                  label="name"
-                  :reduce="item => item.name"
-                  :options="RoleOption"
-                  :state="handleState('role')"
-                  class="select-size-sm"
-                  @input="clearFormError('role')"
+                v-model="form.role"
+                input-id="role"
+                placeholder="choisir ..."
+                label="name"
+                :options="RoleOption"
+                :state="handleState('role')"
+                class="select-size-sm"
+                @input="form.errors.clear('role')"
               />
               <HasError
-                  :form="form"
-                  field="role"
+                :form="form"
+                field="role"
               />
             </b-form-group>
           </b-col>
           <b-col md="6">
             <b-form-group
-                label="Etat du compte"
-                label-for="status"
+              label="Etat du compte"
+              label-for="status"
             >
               <v-select
-                  v-model="form.status"
-                  input-id="status"
-                  placeholder="choisir ..."
-                  label="label"
-                  :reduce="item => item.value"
-                  :options="StatusOption"
-                  class="select-size-sm"
-                  @input="clearFormError('status')"
+                v-model="form.status"
+                input-id="status"
+                placeholder="choisir ..."
+                label="label"
+                :reduce="item => item.value"
+                :options="StatusOption"
+                class="select-size-sm"
+                @input="form.errors.clear('status')"
               />
               <HasError
-                  :form="form"
-                  field="status"
+                :form="form"
+                field="status"
               />
             </b-form-group>
           </b-col>
@@ -156,14 +155,14 @@
 import {
   BModal, BForm, BRow, BCol, BFormInput, BFormGroup, BInputGroupAppend, BInputGroup,
 } from 'bootstrap-vue'
-import vSelect from 'vue-select'
-import {togglePasswordVisibility} from '@core/mixins/ui/forms'
+import { togglePasswordVisibility } from '@core/mixins/ui/forms'
 import store from '@/store'
 import Form from 'vform'
-import {HasError} from 'vform/src/components/bootstrap5'
-import ToastificationContent from '@core/components/toastification/ToastificationContent.vue'
-import {$statusOption} from '@/OtherConfig'
+import { HasError } from 'vform/src/components/bootstrap5'
+import { toastNotification } from '@/libs/toastification'
+import { $statusOption } from '@/OtherConfig'
 
+const R = require('ramda')
 
 export default {
   name: 'UserModal',
@@ -176,10 +175,7 @@ export default {
     BInputGroupAppend,
     BInputGroup,
     BFormInput,
-    vSelect,
     HasError,
-    // eslint-disable-next-line vue/no-unused-components
-    ToastificationContent,
   },
   mixins: [togglePasswordVisibility],
   data() {
@@ -194,7 +190,7 @@ export default {
         last_name: '',
         email: '',
         password: '',
-        status: '',
+        status: 'Active',
         role: '',
       }),
     }
@@ -213,15 +209,15 @@ export default {
       this.title = 'Ajouter Un Utilisateur'
       if (user) {
         this.form.fill(user)
-        this.title = 'Modification : ' + this.form.first_name + ' ' + this.form.last_name
+        this.form.role = user.role[0]?.name
+        this.title = `Modification : ${this.form.first_name} ${this.form.last_name}`
       }
-
     })
   },
   methods: {
     fetchRoles() {
       store.dispatch('rolesStore/fetchRoles').then(res => {
-        this.RoleOption = res.data
+        this.RoleOption = R.pluck('name')(res.data)
       })
     },
     submit(bvModalEvt) {
@@ -233,7 +229,7 @@ export default {
       store.dispatch('usersStore/addUser', this.form).then(res => {
         this.$nextTick(() => {
           if (this.form.successful) {
-            this.toastNotification(res.data.msg, 'User', 'success')
+            toastNotification(res.data.msg, 'User', 'success')
             this.ModalSync = !this.ModalSync
           }
         })
@@ -243,30 +239,14 @@ export default {
       store.dispatch('usersStore/editUser', this.form).then(res => {
         this.$nextTick(() => {
           if (this.form.successful) {
-            this.toastNotification(res.data.msg, 'User', 'success')
+            toastNotification(res.data.msg, 'User', 'success')
             this.ModalSync = !this.ModalSync
           }
         })
       })
     },
-    clearFormError(field) {
-      this.form.errors.clear(field)
-    },
     handleState(field) {
       return this.form.errors.has(field) ? false : null
-    },
-    toastNotification(text, icon, variant) {
-      this.$toast({
-            component: ToastificationContent,
-            props: {
-              text,
-              icon: `${icon}Icon`,
-              variant,
-            },
-          },
-          {
-            position: 'top-center',
-          })
     },
   },
 }

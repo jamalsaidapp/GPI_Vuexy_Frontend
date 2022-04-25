@@ -1,154 +1,200 @@
 <template>
   <div>
     <DataTable
-        class="p-datatable-gridlines p-datatable-hoverable-rows p-datatable-sm"
-        :value="hasDeletedFilter ? FilterTrashed : tableData"
-        removable-sort
-        :selection.sync="selectedRows"
-        :data-key="DataKey"
-        :paginator="true"
-        :rows="5"
-        :resizable-columns="true"
-        column-resize-mode="fit"
-        :loading="isloading"
-        :filters="filters"
-        paginator-template="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
-        :rows-per-page-options="[5,10,30,100]"
-        :current-page-report-template="'Affichage {first} à {last} de {totalRecords} ' + tableName"
-        :expandedRows="expandedRows"
-        @row-expand="onRowExpand"
-        @row-collapse="onRowCollapse"
-        :row-class="hasDeletedFilter ? FilterDeletedRows : ''"
-        @row-click="rowClick"
+      ref="tableName"
+      show-gridlines
+      class="p-datatable-hoverable-rows p-datatable-sm"
+      responsive-layout="stack"
+      breakpoint="960px"
+      :value="tableData"
+      :loading="isLoading"
+      :expanded-rows.sync="expandedRows"
+      :data-key="dataKey"
+      paginator-template="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
+      :rows-per-page-options="[5,10,30,100]"
+      :current-page-report-template="'Affichage {first} à {last} de {totalRecords} ' + tableName"
+      :paginator="true"
+      :rows="5"
+      :resizable-columns="true"
+      column-resize-mode="fit"
+      sort-mode="multiple"
+      removable-sort
+      :filters.sync="filters"
+      filter-display="menu"
+      :selection.sync="selectedRows"
+      :row-class="hasDeletedFilter ? FilterDeletedRows : ''"
+      context-menu
+      :context-menu-selection.sync="selectedRow"
+      @row-expand="onRowExpand"
+      @row-collapse="onRowCollapse"
+      @row-click="hasExpansion === true ? rowClick($event) : undefined"
+      @row-contextmenu="onRowContextMenu($event)"
     >
       <template #header>
         <div class="table-header mb-1">
-          <b-col md="auto" class="pl-0">
+          <b-col
+            md="auto"
+            class="pr-0"
+          >
             <b-input-group class="input-group-merge">
               <b-input-group-prepend is-text>
-                <feather-icon icon="SearchIcon"/>
+                <feather-icon icon="SearchIcon" />
               </b-input-group-prepend>
               <b-form-input
-                  v-model.trim="filters['global']"
-                  size="sm"
-                  placeholder="Recherche..."
-                  type="search"
+                v-model.trim="filters['global'].value"
+                size="sm"
+                debounce="300"
+                placeholder="Recherche..."
+                type="search"
               />
             </b-input-group>
           </b-col>
-          <b-col md="auto" class="pr-0">
+          <b-col
+            md="auto"
+            class="button_actions pl-0"
+          >
+            <slot name="action_table" />
             <b-button
-                v-if="hasExport"
-                variant="gradient-success"
-                class="btn-icon rounded-circle mr-1"
-                size="sm"
-                @click="exportExcel"
+              v-if="hasExport"
+              variant="gradient-success"
+              class="btn-icon rounded-circle mr-1"
+              size="sm"
+              @click="exportExcel"
             >
-              <feather-icon icon="ShareIcon"/>
+              <feather-icon icon="ShareIcon" />
             </b-button>
             <b-button
-                v-if="hasSelection"
-                variant="gradient-danger"
-                class="btn-icon rounded-circle mr-1"
-                :disabled="!selectedRows.length > 0"
-                size="sm"
-                @click="deleteAllFunction"
+              v-if="hasSelection"
+              variant="gradient-danger"
+              class="btn-icon rounded-circle mr-1"
+              :disabled="!selectedRows.length > 0"
+              size="sm"
+              @click="deleteAllFunction"
             >
-              <feather-icon icon="Trash2Icon"/>
+              <feather-icon icon="Trash2Icon" />
             </b-button>
-            <slot name="action_table"/>
             <b-form-checkbox
-                v-model="WithTrashed"
-                class="custom-control-primary fix_postion"
-                name="check-button"
-                switch
-                v-if="hasDeletedFilter"
+              v-if="hasDeletedFilter"
+              v-model="WithTrashed"
+              class="custom-control-primary fix_postion"
+              name="check-button"
+              switch
             >
-        <span class="switch-icon-left">
-          <feather-icon icon="Trash2Icon"/>
-        </span>
+              <span class="switch-icon-left">
+                <feather-icon icon="Trash2Icon" />
+              </span>
               <span class="switch-icon-right">
-          <feather-icon icon="TrashIcon"/>
-        </span>
+                <feather-icon icon="TrashIcon" />
+              </span>
             </b-form-checkbox>
           </b-col>
         </div>
       </template>
 
       <Column
-          v-if="hasSelection"
-          selection-mode="multiple"
-          header-style="width: 3em"
+        v-if="hasSelection"
+        selection-mode="multiple"
+        :header-style="{'width': '2em'}"
       />
 
-      <Column v-if="hasExpansion" :expander="true" headerStyle="width: 3rem"/>
-
       <Column
-          v-for="col in columns"
-          :key="col.field"
-          v-bind="col"
+        v-if="hasExpansion"
+        :expander="true"
+        :header-style="{'width': '2rem'}"
       />
 
-      <template v-if="customCols.length > 0 && hasCustomCols">
-        <Column
-            v-for="col in customCols"
-            :key="col.field"
-            v-bind="col"
-            style="'width: 100px'"
-        >
-          <template #body="slotProps">
-            <slot
-                :props="slotProps.data[col.field]"
-                :field="col.field"
-                name="custom_cols"
-            />
-          </template>
-        </Column>
-      </template>
-
       <Column
-          v-if="hasActions"
-          field="actions"
-          header="Actions"
+        v-for="col in columns"
+        :key="col.field"
+        v-bind="col"
+        :show-filter-operator="false"
       >
-        <template #body="slotProps">
+        <template
+          v-if="col.hasComponent"
+          #body="{data}"
+        >
+          <component
+            :is="col.component"
+            :field="col.field"
+            :slot-props="data[col.field]"
+          />
+        </template>
+        <template
+          v-else
+          #body="{data}"
+        >
+          {{ data[col.field] }}
+        </template>
+        <template
+          v-if="col.filtered"
+          #filter="{filterModel, filterCallback}"
+        >
+          <InputText
+            v-model="filterModel.value"
+            type="text"
+            class="p-inputtext-sm "
+            placeholder="Search by name"
+            @keydown.enter="filterCallback()"
+          /></template>
+      </Column>
+
+      <Column
+        v-if="hasActions"
+        field="actions"
+        header="Actions"
+      >
+        <template #body="{data}">
           <slot
-              :props="slotProps.data"
-              name="actions_button"
+            :props="data"
+            name="actions_button"
           />
         </template>
       </Column>
+
+      <template
+        v-if="selectedRows.length > 0"
+        #footer
+      >
+        <span> {{ selectedRows.length }} lignes Séléctionner</span>
+      </template>
+
+      <template #expansion="{data}">
+        <slot
+          name="expand"
+          :props="data"
+        />
+      </template>
 
       <template #empty>
         <span v-if="!WithTrashed">Aucun element trouver</span>
         <span v-else>Aucun element supprimer</span>
       </template>
-
-      <template
-          v-if="selectedRows.length > 0"
-          #footer
-      >
-        <span> {{ selectedRows.length }} lignes Séléctionner</span>
-      </template>
-
-      <template #expansion="slotProps">
-        <slot name="expand" :props="slotProps.data"></slot>
-      </template>
     </DataTable>
+    <ContextMenu
+      v-if="menuOptions"
+      ref="cm"
+      append-to="body"
+      :model="menuOptions"
+    />
   </div>
 </template>
 
 <script>
 import {
-  BButton, BFormInput, BCol, BInputGroup, BInputGroupPrepend, BDropdown, BFormCheckbox
+  BButton, BFormInput, BCol, BInputGroup, BInputGroupPrepend, BFormCheckbox,
 } from 'bootstrap-vue'
-import InputText from 'primevue/inputtext'
 import DataTable from 'primevue/datatable'
 import Column from 'primevue/column'
-import 'primevue/resources/themes/saga-blue/theme.css'
+import InputText from 'primevue/inputtext'
+import ContextMenu from 'primevue/contextmenu'
+// import 'primevue/resources/themes/saga-blue/theme.css'
+// import 'primevue/resources/themes/tailwind-light/theme.css'
+import 'primevue/resources/themes/fluent-light/theme.css'
 import 'primevue/resources/primevue.min.css'
 import 'primeicons/primeicons.css'
 
+import FilterMatchMode from 'primevue/api/FilterMatchMode'
+import FilterOperator from 'primevue/api/FilterOperator'
 
 const R = require('ramda')
 
@@ -158,20 +204,20 @@ export default {
     BButton,
     DataTable,
     Column,
-    InputText,
     BFormInput,
     BCol,
     BInputGroup,
     BInputGroupPrepend,
-    BDropdown,
     BFormCheckbox,
+    ContextMenu,
+    InputText,
   },
   props: {
     tableName: {
       required: true,
       type: String,
     },
-    DataKey: {
+    dataKey: {
       required: false,
       type: String,
       default() {
@@ -192,19 +238,12 @@ export default {
         return []
       },
     },
-    customCols: {
-      required: false,
-      type: Array,
-      default() {
-        return []
-      },
-    },
     hasPaginator: {
       required: false,
       type: Boolean,
       default: true,
     },
-    isloading: {
+    isLoading: {
       required: false,
       type: Boolean,
       default: false,
@@ -239,14 +278,38 @@ export default {
       type: Boolean,
       default: false,
     },
+    hasFilter: {
+      required: false,
+      type: Boolean,
+      default: false,
+    },
+    globalFilterFields: {
+      required: false,
+      type: Array,
+      default() {
+        return []
+      },
+    },
+    menuOptions: {
+      required: false,
+      type: Array,
+      default() {
+        return null
+      },
+    },
   },
   data() {
     return {
-      filters: {},
+      filters: {
+        global: { value: null, matchMode: 'contains' },
+        // first_name: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
+      },
       selectedRows: [],
+      selectedRow: null,
       expandedRows: [],
       selectedColumns: null,
       WithTrashed: false,
+      data: [],
     }
   },
   computed: {
@@ -256,24 +319,28 @@ export default {
     SelectedColfield() {
       return R.map(R.path(['field']))(this.columns).filter(opt => this.SelectedColName.indexOf(opt) === -1)
     },
-    FilterTrashed() {
-      if (!this.WithTrashed)
-        return this.tableData.filter(row => {
-          return row.deleted_at === null
-        })
-      return this.tableData.filter(row => {
-        return row.deleted_at !== null
-      })
-    },
   },
   watch: {
     selectedRows(newValue) {
       this.$emit('selected-rows', newValue)
     },
+    selectedRow(newValue) {
+      this.$emit('selected-row', newValue)
+    },
+    tableData(newVal) {
+      this.data = newVal.filter(row => row.deleted_at === null)
+    },
+    WithTrashed(newVal) {
+      if (newVal) this.data = this.tableData.filter(row => row.deleted_at !== null)
+      else this.data = this.tableData.filter(row => row.deleted_at === null)
+    },
+  },
+  created() {
+    this.filterByCol()
   },
   methods: {
     rowClick(record) {
-      const OldRecordData = !!this.expandedRows?.length ? this.expandedRows[0] : null
+      const OldRecordData = this.expandedRows?.length ? this.expandedRows[0] : null
       this.expandedRows = []
       this.expandedRows.push(record.data)
       if (OldRecordData === record.data) {
@@ -281,13 +348,13 @@ export default {
       }
     },
     deleteAllFunction() {
-      this.$emit('delete-all', R.pluck(this.DataKey)(this.selectedRows))
+      this.$emit('delete-all', R.pluck(this.dataKey)(this.selectedRows))
     },
     exportExcel() {
       this.$emit('export-excel')
     },
     onRowExpand(event) {
-      this.expandedRows = this.tableData.filter(p => p[this.DataKey] === event.data[this.DataKey])
+      this.expandedRows = this.tableData.filter(p => p[this.dataKey] === event.data[this.dataKey])
     },
     onRowCollapse(event) {
       if (event.data) this.expandedRows = null
@@ -295,7 +362,18 @@ export default {
     FilterDeletedRows(data) {
       return data.deleted_at !== null ? 'bg-red' : ''
     },
-
+    onRowContextMenu(event) {
+      const vm = this
+      vm.$refs.cm.show(event.originalEvent)
+    },
+    filterByCol() {
+      this.$root.$on('filterByCol', data => {
+        this.data = data
+      })
+    },
+    log() {
+      console.log('test')
+    },
   },
 }
 </script>
@@ -309,4 +387,68 @@ export default {
   float: left;
   margin: 3px 8px 0 0;
 }
+table .btn.btn-sm.btn-icon, table .btn-group-sm > .btn.btn-icon{
+  padding: 0.3rem;
+  margin-right: 0.5rem;
+}
+.p-contextmenu ,.p-contextmenu .p-submenu-list{
+  padding: unset;
+}
+.p-datatable.p-datatable-sm .p-datatable-tbody > tr > td{
+  padding: 4px 5px !important;
+}
+.p-datatable .p-column-header-content {
+  justify-content: center;
+}
+.table-header, .button_actions{
+  display: flex;
+  flex-direction: row-reverse;
+}
+.button_actions{
+  display: flex;
+  flex-direction: row;
+}
+.p-column-filter-menu-button.p-column-filter-menu-button-active, .p-column-filter-menu-button.p-column-filter-menu-button-active:hover {
+  background: #1064a1;
+  color: #fff;
+  border-radius: 15px;
+}
+.p-datatable .p-sortable-column .p-sortable-column-badge {
+  border-radius: 50%;
+  background: #1064a1;
+  color: #fff;
+}
+.p-column-filter-overlay-menu .p-column-filter-add-rule {
+   padding: unset !important;
+}
 </style>
+
+<!--
+:ref="tableName"
+:filters.sync="filters"
+filter-display="menu"
+show-gridlines
+class="p-datatable-hoverable-rows p-datatable-sm"
+:value="data"
+sort-mode="multiple"
+removable-sort
+:selection.sync="selectedRows"
+:data-key="dataKey"
+:paginator="true"
+:rows="5"
+:resizable-columns="true"
+column-resize-mode="fit"
+:loading="isLoading"
+paginator-template="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
+:rows-per-page-options="[5,10,30,100]"
+:current-page-report-template="'Affichage {first} à {last} de {totalRecords} ' + tableName"
+:expanded-rows.sync="expandedRows"
+:row-class="hasDeletedFilter ? FilterDeletedRows : ''"
+context-menu
+:context-menu-selection.sync="selectedRow"
+responsive-layout="stack"
+breakpoint="960px"
+@row-expand="onRowExpand"
+@row-collapse="onRowCollapse"
+@row-click="hasExpansion === true ? rowClick($event) : undefined"
+@row-contextmenu="onRowContextMenu($event)"-->

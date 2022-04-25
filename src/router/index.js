@@ -4,17 +4,16 @@ import VueRouter from 'vue-router'
 // Routes
 import { canNavigate } from '@/libs/acl/routeProtection'
 // eslint-disable-next-line import/no-cycle
-import { isUserLoggedIn, getUserData, getHomeRouteForLoggedInUser } from '@/auth/utils'
+import { isUserLoggedIn } from '@/auth/utils'
 import auth from '@/router/routes/auth'
 import settings from '@/router/routes/settings'
 import helpdesk from '@/router/routes/helpdesk'
-import gestion_pc from '@/router/routes/gestion_pc'
+import gestionPC from '@/router/routes/gestion_pc'
 
 // eslint-disable-next-line import/no-cycle
 // import useJwt from '@/auth/jwt/useJwt'
 
 Vue.use(VueRouter)
-
 
 const router = new VueRouter({
   mode: 'history',
@@ -27,7 +26,7 @@ const router = new VueRouter({
     {
       path: '/dashboard',
       name: 'dashboard',
-      component: () => import('@/views/dashboard/dashboard.vue'),
+      component: () => import('@/views/dashboard/dashboard'),
       meta: {
         resource: 'dashboard',
         pageTitle: 'Dashboard',
@@ -36,15 +35,7 @@ const router = new VueRouter({
     ...auth,
     ...settings,
     ...helpdesk,
-    ...gestion_pc,
-    {
-      path: '/print-page',
-      name: 'print-page',
-      component: () => import('@/views/gestion_pc/print/index'),
-      meta: {
-        layout: 'full',
-      },
-    },
+    ...gestionPC,
     {
       path: '*',
       redirect: 'error-404',

@@ -1,80 +1,44 @@
 <template>
   <div>
     <b-modal
-        ref="RoleModal"
-        v-model="ModalSync"
-        :title="title"
-        centered
-        :ok-title="form.id ? 'Modifier' : 'Ajouter'"
-        cancel-title="Férmer"
-        button-size="sm"
-        no-close-on-backdrop
-        size="sm"
-        @ok="submit"
+      ref="RoleModal"
+      v-model="ModalSync"
+      :title="title"
+      centered
+      :ok-title="form.id ? 'Modifier' : 'Ajouter'"
+      cancel-title="Férmer"
+      button-size="sm"
+      no-close-on-backdrop
+      size="md"
+      @ok="submit"
     >
       <b-form @submit.prevent>
         <b-row class="mt-1">
           <b-col md="12">
-            <b-form-group
+            <b-row>
+              <b-form-group
                 label="Nom du Role"
                 label-for="name"
-            >
-              <b-form-input
+                class="w-100"
+              >
+                <b-form-input
                   id="nom"
                   v-model="form.name"
                   size="sm"
                   placeholder="Tapper Nom"
                   :state="handleState('name')"
-                  @input="clearFormError('name')"
-              />
-              <HasError
+                  @input="form.errors.clear('name')"
+                />
+                <HasError
                   :form="form"
                   field="name"
-              />
-            </b-form-group>
-          </b-col>
-          <b-col md="12">
-            <b-form-group
-                label="Permissions Affecter"
-                label-for="Permissions"
-            >
-              <b-row>
-                <b-col md="6">
-                  <b-form-input
-                      v-model="searchPerms"
-                      size="sm"
-                      placeholder="Recherche ..."
-                      class="mb-1"
-                  />
-                </b-col>
-                <b-col md="6">
-                  <v-select
-                      v-model="selectedResource"
-                      placeholder="Grouper Par ..."
-                      label="label"
-                      :options="permsResource"
-                      class="select-size-sm"
-                      @input="groupedBy"
-                  />
-                </b-col>
-
-              </b-row>
-              <b-row class="permission_scrl pl-1 mx-auto mb-1">
-                <b-form-checkbox-group
-                    id="checkbox-group-1"
-                    v-model="form.permissions"
-                    :options="permsName.filter(perm => perm && perm.includes(searchPerms.charAt(0).toUpperCase()))"
-                    name="flavour-1"
-                    size="sm"
-                    class="pl-1"
                 />
-              </b-row>
-              <HasError
-                  :form="form"
-                  field="permissions"
-              />
-              <span> Total Permissions Selectioner : <span class="font-weight-bold">{{ form.permissions.length }}</span></span>
-            </b-form-group>
+              </b-form-group>
+            </b-row>
+            <grouped-permissions
+              :permissions="InitialPermissions"
+              :checked-permissions="form.permissions"
+            />
           </b-col>
         </b-row>
       </b-form>
@@ -84,14 +48,13 @@
 
 <script>
 import {
-  BModal, BForm, BRow, BCol, BFormInput, BFormGroup, BFormCheckboxGroup,
+  BModal, BForm, BRow, BCol, BFormInput, BFormGroup,
 } from 'bootstrap-vue'
 import Form from 'vform'
-import {HasError} from 'vform/src/components/bootstrap5'
-import ToastificationContent from '@core/components/toastification/ToastificationContent.vue'
-import vSelect from 'vue-select'
+import { HasError } from 'vform/src/components/bootstrap5'
 import store from '@/store'
-import app_rolesModule from "@/views/settings/roles&permissions/Roles/rolesStoreModule";
+import { toastNotification } from '@/libs/toastification'
+import GroupedPermissions from '@/views/settings/utilisateurs/components/GroupedPermissions'
 
 const R = require('ramda')
 
@@ -105,10 +68,7 @@ export default {
     BFormGroup,
     BFormInput,
     HasError,
-    // eslint-disable-next-line vue/no-unused-components
-    ToastificationContent,
-    BFormCheckboxGroup,
-    vSelect,
+    GroupedPermissions,
   },
   props: ['InitialPermissions'],
   data() {
@@ -120,15 +80,7 @@ export default {
         name: '',
         permissions: [],
       }),
-      searchPerms: '',
-      selectedResource: '',
-      permsName: [],
     }
-  },
-  computed: {
-    permsResource() {
-      return R.uniq(R.pluck('subject')(this.InitialPermissions))
-    },
   },
 
   created() {
@@ -136,16 +88,15 @@ export default {
       this.ModalSync = !this.ModalSync
       this.form.clear()
       this.form.reset()
-      // eslint-disable-next-line no-multi-assign
-      this.permsName = this.selectedResource = []
-      this.searchPerms = ''
       this.title = 'Ajouter Un Role'
       if (role) {
         this.form.fill(role)
         this.form.permissions = R.pluck('name')(role.permissions)
-        this.title = 'Modification : ' + role.name
+        this.title = `Modification : ${role.name}`
       }
-      this.permsName = R.pluck('name')(this.InitialPermissions)
+    })
+    this.$root.$on('on-permissions-change', permissions => {
+      this.form.permissions = permissions
     })
   },
   methods: {
@@ -155,67 +106,32 @@ export default {
       this.form.id ? this.editRole() : this.addRole()
     },
     addRole() {
-      store.dispatch('app_roles/addRole', this.form).then(res => {
+      store.dispatch('rolesStore/addRole', this.form).then(res => {
         this.$nextTick(() => {
           if (this.form.successful) {
-            this.toastNotification(res.data.msg, 'Role', 'success')
+            toastNotification(res.data.msg, 'Role', 'success')
             this.ModalSync = !this.ModalSync
           }
         })
       })
     },
     editRole() {
-      store.dispatch('app_roles/editRole', this.form).then(res => {
+      store.dispatch('rolesStore/editRole', this.form).then(res => {
         this.$nextTick(() => {
           if (this.form.successful) {
-            this.toastNotification(res.data.msg, 'Role', 'success')
+            toastNotification(res.data.msg, 'Role', 'success')
             this.ModalSync = !this.ModalSync
           }
         })
       })
     },
-    groupedBy() {
-      const GroupedPerms = this.InitialPermissions.filter(perm => perm && perm.subject.includes(this.selectedResource))
-      this.permsName = R.pluck('name')(GroupedPerms)
-      if (!this.selectedResource) this.permsName = R.pluck('name')(this.InitialPermissions)
-    },
-    clearFormError(field) {
-      this.form.errors.clear(field)
-    },
     handleState(field) {
       return this.form.errors.has(field) ? false : null
-    },
-    toastNotification(text, icon, variant) {
-      this.$toast({
-            component: ToastificationContent,
-            props: {
-              text,
-              icon: `${icon}Icon`,
-              variant,
-            },
-          },
-          {
-            position: 'top-center',
-          })
     },
   },
 }
 </script>
 
 <style lang="scss">
-@import '@core/scss/vue/libs/vue-select.scss';
 
-.custom-checkbox.b-custom-control-sm, .input-group-sm .custom-checkbox {
-  padding-left: 0.3125rem;
-}
-
-.custom-control-inline {
-  margin-right: 2rem;
-}
-
-.permission_scrl {
-  height: 70px;
-  overflow-y: scroll;
-  border: 1px solid #d8dfe4;
-}
 </style>

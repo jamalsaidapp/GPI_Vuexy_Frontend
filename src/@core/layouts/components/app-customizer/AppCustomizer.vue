@@ -181,7 +181,6 @@
 import {
   BLink, BFormRadioGroup, BFormGroup, BFormCheckbox,
 } from 'bootstrap-vue'
-import vSelect from 'vue-select'
 import VuePerfectScrollbar from 'vue-perfect-scrollbar'
 import useAppCustomizer from './useAppCustomizer'
 
@@ -194,7 +193,6 @@ export default {
     BFormGroup,
 
     // 3rd party
-    vSelect,
     VuePerfectScrollbar,
 
   },
@@ -301,9 +299,6 @@ export default {
 }
 </script>
 
-<style lang="scss">
-@import '@core/scss/vue/libs/vue-select.scss';
-</style>
 
 <style lang="scss" scoped>
 @import '~@core/scss/base/bootstrap-extended/include';

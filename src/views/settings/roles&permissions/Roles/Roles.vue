@@ -43,7 +43,7 @@
             variant="gradient-danger"
             class="btn-icon rounded-circle"
             size="sm"
-            @click="log(props.props.id)"
+            @click="deleteRole(props.props.id)"
           >
             <feather-icon icon="Trash2Icon" />
           </b-button>
@@ -58,15 +58,14 @@
 import {
   BButton, BCard,
 } from 'bootstrap-vue'
-import JDatatable from '@/myCompenents/JDatatable.vue'
 import store from '@/store'
 import { mapGetters } from 'vuex'
-import RoleModal from './RoleModal.vue'
+import { ConfirmDelete } from '@/libs/sweet-alerts'
+import RoleModal from './RoleModal'
 
 export default {
   name: 'Index',
   components: {
-    JDatatable,
     BButton,
     BCard,
     RoleModal,
@@ -95,8 +94,8 @@ export default {
       perms: 'permissionsStore/getPermissions',
     }),
   },
- async created() {
-   await this.fetchRoles()
+  async created() {
+    await this.fetchRoles()
   },
 
   methods: {
@@ -105,6 +104,9 @@ export default {
     },
     OpenRoleModal(role) {
       this.$root.$emit('role-modal-sync', role)
+    },
+    deleteRole(id) {
+      ConfirmDelete('rolesStore/deleteRole', id)
     },
   },
 }

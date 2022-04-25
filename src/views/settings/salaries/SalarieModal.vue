@@ -1,6 +1,6 @@
 <template>
-<div>
-  <b-modal
+  <div>
+    <b-modal
       ref="OrdinateurModal"
       v-model="ModalSync"
       :title="title"
@@ -10,40 +10,59 @@
       button-size="sm"
       no-close-on-backdrop
       @ok="submit"
-  >
-    <b-form @submit.prevent>
-      <b-row class="mt-1">
-        <b-col md="12">
-          <b-form-group
+    >
+      <b-form @submit.prevent>
+        <b-row class="mt-1">
+          <b-col md="6">
+            <b-form-group
               label="Nom Complete"
               label-for="full_name"
-          >
-            <b-form-input
+            >
+              <b-form-input
                 id="full_name"
                 v-model="form.full_name"
                 size="sm"
                 placeholder="Tapper Prénom"
                 :state="handleState('full_name')"
-                @input="clearFormError('full_name')"
-            />
-            <HasError
+                @input="form.errors.clear('full_name')"
+              />
+              <HasError
                 :form="form"
                 field="full_name"
-            />
-          </b-form-group>
-        </b-col>
-      </b-row>
-    </b-form>
-  </b-modal>
-</div>
+              />
+            </b-form-group>
+          </b-col>
+          <b-col md="6">
+            <b-form-group
+              label="Affecter un compte"
+              label-for="full_name"
+            >
+              <v-select
+                v-model="form.user_id"
+                placeholder="choisir ..."
+                label="name"
+                :reduce="item => item.id"
+                :options="options"
+                class="select-size-sm"
+                @input="form.is_user = form.user_id !== null"
+              />
+            </b-form-group>
+          </b-col>
+        </b-row>
+      </b-form>
+    </b-modal>
+  </div>
 </template>
 
 <script>
-import {BCol, BForm, BFormGroup, BFormInput, BModal, BRow} from "bootstrap-vue";
-import {HasError} from "vform/src/components/bootstrap5";
-import ToastificationContent from "@core/components/toastification/ToastificationContent";
-import Form from "vform";
-import store from "@/store";
+import {
+  BCol, BForm, BFormGroup, BFormInput, BModal, BRow,
+} from 'bootstrap-vue'
+import { HasError } from 'vform/src/components/bootstrap5'
+import Form from 'vform'
+import store from '@/store'
+import { toastNotification } from '@/libs/toastification'
+import { mapGetters } from 'vuex'
 
 export default {
   name: 'SalarieModal',
@@ -55,8 +74,6 @@ export default {
     BFormInput,
     BFormGroup,
     HasError,
-    // eslint-disable-next-line vue/no-unused-components
-    ToastificationContent,
   },
   data() {
     return {
@@ -65,9 +82,19 @@ export default {
       form: new Form({
         id: '',
         full_name: '',
+        is_user: false,
+        user_id: null,
       }),
-
     }
+  },
+  computed: {
+    ...mapGetters({
+      users: 'usersStore/getUsers',
+      loading: 'usersStore/getLoading',
+    }),
+    options() {
+      return this.users.map(user => ({ name: `${user.first_name} ${user.last_name}`, id: user.id }))
+    },
   },
   created() {
     this.$root.$on('salarie-modal-sync', salarie => {
@@ -77,11 +104,13 @@ export default {
       this.title = 'Ajouter Un Salarie'
       if (salarie) {
         this.form.fill(salarie)
-        this.title = 'Modification Salarie : ' + this.form.full_name
+        this.form.is_user = Boolean(this.form.is_user)
+        this.title = `Modification Salarie : ${this.form.full_name}`
       }
     })
+    store.dispatch('usersStore/fetchUsers')
   },
-  methods:{
+  methods: {
     submit(bvModalEvt) {
       bvModalEvt.preventDefault()
       // eslint-disable-next-line no-unused-expressions
@@ -91,7 +120,7 @@ export default {
       store.dispatch('salariesStore/addSalarie', this.form).then(res => {
         this.$nextTick(() => {
           if (this.form.successful) {
-            this.toastNotification(res.data.msg, 'Salarie', 'success')
+            toastNotification(res.data.msg, 'Salarie', 'success')
             this.ModalSync = !this.ModalSync
           }
         })
@@ -101,35 +130,15 @@ export default {
       store.dispatch('salariesStore/editSalarie', this.form).then(res => {
         this.$nextTick(() => {
           if (this.form.successful) {
-            this.toastNotification(res.data.msg, 'Salarie', 'success')
+            toastNotification(res.data.msg, 'Salarie', 'success')
             this.ModalSync = !this.ModalSync
           }
         })
       })
     },
-    clearFormError(field) {
-      this.form.errors.clear(field)
-    },
     handleState(field) {
       return this.form.errors.has(field) ? false : null
     },
-    toastNotification(text, icon, variant) {
-      this.$toast({
-            component: ToastificationContent,
-            props: {
-              text,
-              icon: `${icon}Icon`,
-              variant,
-            },
-          },
-          {
-            position: 'top-center',
-          })
-    },
-  }
+  },
 }
 </script>
-
-<style scoped>
-
-</style>

@@ -1,13 +1,5 @@
 // Feather font icon - For form-wizard
 // * Shall remove it if not using font-icons of feather-icons - For form-wizard
-require('@core/assets/fonts/feather/iconfont.css') // For form-wizard
-
-// import core styles
-require('@core/scss/core.scss')
-
-// import assets styles
-require('@/assets/scss/style.scss')
-
 import Vue from 'vue'
 import { ToastPlugin, ModalPlugin } from 'bootstrap-vue'
 import VueCompositionAPI from '@vue/composition-api'
@@ -15,7 +7,7 @@ import VueCompositionAPI from '@vue/composition-api'
 // import i18n from '@/libs/i18n'
 import router from './router'
 import store from './store'
-import App from './App.vue'
+import App from './App'
 
 // Global Components
 import './global-components'
@@ -32,6 +24,14 @@ import '@/libs/tour'
 
 // Axios Mock Adapter
 import '@/@fake-db/db'
+
+require('@core/assets/fonts/feather/iconfont.css') // For form-wizard
+
+// import core styles
+require('@core/scss/core.scss')
+
+// import assets styles
+require('@/assets/scss/style.scss')
 
 // BSV Plugin Registration
 Vue.use(ToastPlugin)

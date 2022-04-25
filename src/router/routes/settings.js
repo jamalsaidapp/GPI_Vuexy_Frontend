@@ -16,7 +16,8 @@ export default [
   {
     path: '/parametres/salaries',
     name: 'salaries',
-    component: () => import('@/views/settings/salaries/Salaries.vue'),
+    // eslint-disable-next-line import/no-unresolved
+    component: () => import('@/views/settings/salaries'),
     meta: {
       pageTitle: 'Paramétres',
       breadcrumb: [

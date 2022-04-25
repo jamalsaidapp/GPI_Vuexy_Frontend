@@ -57,17 +57,15 @@
 import {
   BButton, BCard,
 } from 'bootstrap-vue'
-import JDatatable from '@/myCompenents/JDatatable.vue'
 import store from '@/store'
 import { mapGetters } from 'vuex'
-import PermissionsModal from './PermissionsModal.vue'
+import PermissionsModal from './PermissionsModal'
 
 const R = require('ramda')
 
 export default {
   name: 'Index',
   components: {
-    JDatatable,
     BButton,
     BCard,
     PermissionsModal,
@@ -106,8 +104,8 @@ export default {
       loading: 'permissionsStore/getLoading',
     }),
   },
- async created() {
-   await this.fetchPermissions()
+  async created() {
+    await this.fetchPermissions()
   },
 
   methods: {

@@ -24,7 +24,7 @@
                 size="sm"
                 placeholder="Tapper Nom"
                 :state="handleState('name')"
-                @input="clearFormError('name')"
+                @input="form.errors.clear('name')"
               />
               <HasError
                 :form="form"
@@ -43,7 +43,7 @@
                 size="sm"
                 placeholder="Tapper Action"
                 :state="handleState('action')"
-                @input="clearFormError('action')"
+                @input="form.errors.clear('action')"
               />
               <HasError
                 :form="form"
@@ -69,7 +69,7 @@
                     label="label"
                     :options="Resourcefilter"
                     class="select-size-sm"
-                    @input="clearFormError('subject')"
+                    @input="form.errors.clear('subject')"
                   />
                   <HasError
                     :form="form"
@@ -110,11 +110,10 @@
 import {
   BModal, BForm, BRow, BCol, BFormInput, BFormGroup, BButton,
 } from 'bootstrap-vue'
-import vSelect from 'vue-select'
 import Form from 'vform'
 import { HasError } from 'vform/src/components/bootstrap5'
-import ToastificationContent from '@core/components/toastification/ToastificationContent.vue'
 import store from '@/store'
+import { toastNotification } from '@/libs/toastification'
 
 const R = require('ramda')
 
@@ -128,10 +127,7 @@ export default {
     BFormGroup,
     BButton,
     BFormInput,
-    vSelect,
     HasError,
-    // eslint-disable-next-line vue/no-unused-components
-    ToastificationContent,
   },
   props: ['subject'],
   data() {
@@ -161,7 +157,7 @@ export default {
       this.title = 'Ajouter Une Permission'
       if (permission.id) {
         this.form.fill(permission)
-        this.title = 'Modifictaion : ' + permission.name
+        this.title = `Modifictaion : ${permission.name}`
       }
     })
   },
@@ -175,7 +171,7 @@ export default {
       store.dispatch('permissionsStore/addPermission', this.form).then(res => {
         this.$nextTick(() => {
           if (this.form.successful) {
-            this.toastNotification(res.data.msg, 'Permissions', 'success')
+            toastNotification(res.data.msg, 'Permissions', 'success')
             this.ModalSync = !this.ModalSync
           }
         })
@@ -185,7 +181,7 @@ export default {
       store.dispatch('permissionsStore/editPermission', this.form).then(res => {
         this.$nextTick(() => {
           if (this.form.successful) {
-            this.toastNotification(res.data.msg, 'Permissions', 'success')
+            toastNotification(res.data.msg, 'Permissions', 'success')
             this.ModalSync = !this.ModalSync
           }
         })
@@ -198,29 +194,9 @@ export default {
       }
       this.newResource = ''
     },
-    clearFormError(field) {
-      this.form.errors.clear(field)
-    },
     handleState(field) {
       return this.form.errors.has(field) ? false : null
-    },
-    toastNotification(text, icon, variant) {
-      this.$toast({
-        component: ToastificationContent,
-        props: {
-          text,
-          icon: `${icon}Icon`,
-          variant,
-        },
-      },
-      {
-        position: 'top-center',
-      })
     },
   },
 }
 </script>
-
-<style lang="scss">
-@import '@core/scss/vue/libs/vue-select.scss';
-</style>
