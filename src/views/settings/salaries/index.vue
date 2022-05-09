@@ -1,58 +1,40 @@
 <template>
-  <div>
-    <b-card
-      no-body
-      class="p-1"
-    >
-      <JDatatable
-        table-name="Salarie"
-        :table-data="salaries"
-        :selected-rows="selectedRows"
-        :columns="columns"
-        :isloading="loading"
-        has-deleted-filter
-        :has-actions="false"
-        :menu-options="menuOptions"
-        @selected-rows="newValue => selectedRows = newValue"
-        @selected-row="row => selectedRow = row "
-      >
-        <template #action_table>
-          <b-button
-            variant="gradient-secondary"
-            class="btn-icon rounded-circle mr-1"
-            size="sm"
-            @click="fetchSalaries"
-          >
-            <feather-icon icon="RefreshCwIcon" />
-          </b-button>
-          <b-button
-            variant="gradient-primary"
-            class="btn-icon rounded-circle"
-            size="sm"
-            @click="OpenSalarieModal(null)"
-          >
-            <feather-icon icon="PlusIcon" />
-          </b-button>
-        </template>
-
-      </JDatatable>
-    </b-card>
+  <b-card
+    no-body
+    class="p-1"
+  >
+    <JDatatable
+      table-name="Salarie"
+      :table-data="salaries"
+      :selected-rows="selectedRows"
+      :columns="columns"
+      :is-loading="loading"
+      has-deleted-filter
+      :has-actions="false"
+      :menu-options="menuOptions"
+      :refresh="fetchSalaries"
+      :add-btn="OpenSalarieModal"
+      :actions-buttons="actionsButtons"
+      @selected-rows="newValue => selectedRows = newValue"
+      @selected-row="row => selectedRow = row "
+    />
     <SalarieModal />
-  </div>
+  </b-card>
+
 </template>
 
 <script>
-import { BButton, BCard } from 'bootstrap-vue'
+import { BCard } from 'bootstrap-vue'
 import { mapGetters } from 'vuex'
 import store from '@/store'
 import SalarieModal from '@/views/settings/salaries/SalarieModal'
 import { toastNotification } from '@/libs/toastification'
 import { ConfirmDelete } from '@/libs/sweet-alerts'
+import xml2js from 'xml2js'
 
 export default {
   name: 'Salaries',
   components: {
-    BButton,
     BCard,
     SalarieModal,
   },
@@ -70,8 +52,18 @@ export default {
           sortable: true,
         },
         {
+          field: 'cin',
+          header: 'CIN',
+          sortable: true,
+        },
+        {
           field: 'ordinateurs_count',
-          header: 'Nombre du PC Affecter',
+          header: 'N° PC Affecter',
+          sortable: true,
+        },
+        {
+          field: 'phone_fix',
+          header: 'Fix N°',
           sortable: true,
         },
         {
@@ -98,6 +90,13 @@ export default {
           label: 'Restaurer', icon: 'pi pi-fw pi-refresh', command: () => this.restoreSalarie(this.selectedRow.id), visible: false,
         },
         { label: 'Supprimer', icon: 'pi pi-fw pi-trash', command: () => this.deleteSalarie(this.selectedRow.id) },
+      ],
+      actionsButtons: [
+        { variant: 'gradient-primary', icon: 'PlusIcon', command: () => this.OpenSalarieModal() },
+        { variant: 'gradient-secondary', icon: 'RefreshCwIcon', command: () => this.fetchSalaries() },
+        {
+          variant: 'outline-warning', icon: 'ArrowDownIcon', command: () => this.exportXML(), tooltip: 'Export Contact (.xml)',
+        },
       ],
     }
   },
@@ -136,6 +135,43 @@ export default {
           }
         })
       })
+    },
+    exportXML() {
+      const AddressBook = [{ version: 1 }]
+      this.salaries.filter(item => item.phone_fix !== '***')
+        .map(item => ({ id: item.phone_primary, name: item.full_name, phone: item.phone_fix })).forEach(item => {
+          AddressBook.push(this.serializeContact(item))
+        })
+      const array = { AddressBook }
+      const builder = new xml2js.Builder()
+      const xml = builder.buildObject(array)
+      const date = (new Date()).toLocaleDateString()
+      if (xml) {
+        this.downloadXML(xml, `Contacts_${date}.xml`)
+      }
+    },
+    serializeContact(contact) {
+      return {
+        Contact: [
+          { FirstName: contact.name },
+          { Primary: contact.id },
+          {
+            Phone: {
+              $: { type: 'work' },
+              phonenumber: contact.phone,
+              accountindex: contact.id,
+            },
+          },
+        ],
+      }
+    },
+    downloadXML(xml, fileName) {
+      const blob = new Blob([xml], { type: 'application/xml' })
+      const link = document.createElement('a')
+      link.href = URL.createObjectURL(blob)
+      link.download = fileName
+      link.click()
+      URL.revokeObjectURL(link.href)
     },
   },
 }

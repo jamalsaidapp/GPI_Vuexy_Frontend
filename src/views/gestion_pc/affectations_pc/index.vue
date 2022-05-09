@@ -7,34 +7,14 @@
       <JDatatable
         table-name="Affectation"
         :table-data="affectations"
-        :selected-rows="selectedRows"
         :columns="columns"
         :is-loading="loading"
         has-expansion
-        :has-actions="false"
         data-key="sn"
         :menu-options="menuOptions"
+        :actions-buttons="actionsButtons"
         @selected-row="row => selectedRow = row "
       >
-        <template #action_table>
-          <b-button
-            variant="gradient-secondary"
-            class="btn-icon rounded-circle mr-1"
-            size="sm"
-            @click="fetchAffectations"
-          >
-            <feather-icon icon="RefreshCwIcon" />
-          </b-button>
-          <b-button
-            variant="gradient-primary"
-            class="btn-icon rounded-circle"
-            size="sm"
-            @click="OpenAffectationModal(null)"
-          >
-            <feather-icon icon="PlusIcon" />
-          </b-button>
-        </template>
-
         <template
           v-slot:expand="{props}"
           class="ml-auto"
@@ -51,9 +31,7 @@
 <script>
 import { mapGetters } from 'vuex'
 import store from '@/store'
-import {
-  BButton, BCard,
-} from 'bootstrap-vue'
+import { BCard } from 'bootstrap-vue'
 import { ConfirmDelete } from '@/libs/sweet-alerts'
 import AffectationModal from './components/AffectationModal'
 import ListOrdinateurAffecter from './components/ListOrdinateurAffecter'
@@ -61,7 +39,6 @@ import ListOrdinateurAffecter from './components/ListOrdinateurAffecter'
 export default {
   name: 'AffectationsTable',
   components: {
-    BButton,
     BCard,
     ListOrdinateurAffecter,
     AffectationModal,
@@ -89,6 +66,10 @@ export default {
           header: 'Nombre du PC Affecter',
           sortable: true,
         },
+      ],
+      actionsButtons: [
+        { variant: 'gradient-primary', icon: 'PlusIcon', command: () => this.OpenAffectationModal() },
+        { variant: 'gradient-secondary', icon: 'RefreshCwIcon', command: () => this.fetchAffectations() },
       ],
       selectedRows: [],
       selectedRow: null,
@@ -318,8 +299,4 @@ export default {
     },
   },
 }
-</script>
-
-<style scoped>
-
-</style>-->
+</script>-->

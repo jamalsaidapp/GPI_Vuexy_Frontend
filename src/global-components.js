@@ -11,4 +11,9 @@ Vue.component(FeatherIcon.name, FeatherIcon)
 Vue.use(PrimeVue)
 
 Vue.component('JDatatable', () => import('@/myCompenents/JDatatable'))
-Vue.component('TestTable', () => import('@/myCompenents/test'))
+
+Vue.directive('uppercase', {
+  update(el) {
+    el.value = el.value.toUpperCase()
+  },
+})

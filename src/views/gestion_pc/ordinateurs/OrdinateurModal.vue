@@ -60,6 +60,7 @@
               <b-form-input
                 id="sn"
                 v-model="form.sn"
+                v-uppercase
                 size="sm"
                 placeholder="Tapper Numéro De Série"
                 :state="handleState('sn')"

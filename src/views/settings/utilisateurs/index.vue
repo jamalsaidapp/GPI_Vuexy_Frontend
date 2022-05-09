@@ -14,38 +14,19 @@
       :has-actions="false"
       :menu-options="menuOptions"
       :has-filter="true"
+      :actions-buttons="actionsButtons"
       @selected-rows="newValue => selectedRows = newValue"
       @delete-all="ids => deleteUser(ids)"
       @export-excel="exportExcel"
       @selected-row="row => selectedRow = row "
-    >
-      <template #action_table>
-        <b-button
-          variant="gradient-primary"
-          class="btn-icon rounded-circle mr-1"
-          size="sm"
-          @click="OpenUserModal(null)"
-        >
-          <feather-icon icon="PlusIcon" />
-        </b-button>
-        <b-button
-          variant="gradient-secondary"
-          class="btn-icon rounded-circle mr-1"
-          size="sm"
-          @click="fetchUsers"
-        >
-          <feather-icon icon="RefreshCwIcon" />
-        </b-button>
-      </template>
-
-    </JDatatable>
+    />
     <UserModal />
     <UserPermissionsModal />
   </b-card>
 </template>
 
 <script>
-import { BCard, BButton } from 'bootstrap-vue'
+import { BCard } from 'bootstrap-vue'
 import { mapGetters } from 'vuex'
 import store from '@/store'
 import { ConfirmDelete, ConfirmRestore } from '@/libs/sweet-alerts'
@@ -57,7 +38,6 @@ export default {
   name: 'Utilisateurs',
   components: {
     BCard,
-    BButton,
     UserModal,
     UserPermissionsModal,
   },
@@ -96,6 +76,10 @@ export default {
           label: 'Restaurer', icon: 'pi pi-fw pi-refresh', command: () => this.restoreUser(this.selectedRow.id), visible: false,
         },
         { label: 'Supprimer', icon: 'pi pi-fw pi-trash', command: () => this.deleteUser(this.selectedRow.id) },
+      ],
+      actionsButtons: [
+        { variant: 'gradient-primary', icon: 'PlusIcon', command: () => this.OpenUserModal() },
+        { variant: 'gradient-secondary', icon: 'RefreshCwIcon', command: () => this.fetchUsers() },
       ],
     }
   },

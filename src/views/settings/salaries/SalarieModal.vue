@@ -13,7 +13,7 @@
     >
       <b-form @submit.prevent>
         <b-row class="mt-1">
-          <b-col md="6">
+          <b-col md="12">
             <b-form-group
               label="Nom Complete"
               label-for="full_name"
@@ -31,8 +31,25 @@
                 field="full_name"
               />
             </b-form-group>
+            <b-form-group
+              label="Affecter un compte"
+              label-for="full_name"
+            >
+              <b-form-input
+                id="cin"
+                v-model="form.cin"
+                size="sm"
+                placeholder="Tapper CIN"
+                :state="handleState('cin')"
+                @input="form.errors.clear('cin')"
+              />
+              <HasError
+                :form="form"
+                field="cin"
+              />
+            </b-form-group>
           </b-col>
-          <b-col md="6">
+          <b-col md="12">
             <b-form-group
               label="Affecter un compte"
               label-for="full_name"
@@ -82,6 +99,7 @@ export default {
       form: new Form({
         id: '',
         full_name: '',
+        cin: '',
         is_user: false,
         user_id: null,
       }),

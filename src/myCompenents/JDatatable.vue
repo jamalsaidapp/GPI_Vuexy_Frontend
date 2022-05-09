@@ -6,7 +6,7 @@
       class="p-datatable-hoverable-rows p-datatable-sm"
       responsive-layout="stack"
       breakpoint="960px"
-      :value="tableData"
+      :value="data"
       :loading="isLoading"
       :expanded-rows.sync="expandedRows"
       :data-key="dataKey"
@@ -54,6 +54,17 @@
             class="button_actions pl-0"
           >
             <slot name="action_table" />
+            <b-button
+              v-for="(btn, index) in actionsButtons"
+              :key="index"
+              v-b-tooltip.hover.top="btn.tooltip"
+              :variant="btn.variant"
+              class="btn-icon rounded-circle mr-1"
+              size="sm"
+              @click="btn.command"
+            >
+              <feather-icon :icon="btn.icon" />
+            </b-button>
             <b-button
               v-if="hasExport"
               variant="gradient-success"
@@ -181,25 +192,29 @@
 
 <script>
 import {
-  BButton, BFormInput, BCol, BInputGroup, BInputGroupPrepend, BFormCheckbox,
+  BButton, BFormInput, BCol, BInputGroup, BInputGroupPrepend, BFormCheckbox, VBTooltip,
 } from 'bootstrap-vue'
 import DataTable from 'primevue/datatable'
 import Column from 'primevue/column'
 import InputText from 'primevue/inputtext'
 import ContextMenu from 'primevue/contextmenu'
+
 // import 'primevue/resources/themes/saga-blue/theme.css'
 // import 'primevue/resources/themes/tailwind-light/theme.css'
 import 'primevue/resources/themes/fluent-light/theme.css'
 import 'primevue/resources/primevue.min.css'
 import 'primeicons/primeicons.css'
 
-import FilterMatchMode from 'primevue/api/FilterMatchMode'
-import FilterOperator from 'primevue/api/FilterOperator'
+// import FilterMatchMode from 'primevue/api/FilterMatchMode'
+// import FilterOperator from 'primevue/api/FilterOperator'
 
 const R = require('ramda')
 
 export default {
   name: 'JDatatable',
+  directives: {
+    'b-tooltip': VBTooltip,
+  },
   components: {
     BButton,
     DataTable,
@@ -213,6 +228,9 @@ export default {
     InputText,
   },
   props: {
+    actionsButtons: {
+      type: Array,
+    },
     tableName: {
       required: true,
       type: String,
@@ -266,7 +284,7 @@ export default {
     hasActions: {
       required: false,
       type: Boolean,
-      default: true,
+      default: false,
     },
     hasCustomCols: {
       required: false,
@@ -309,17 +327,10 @@ export default {
       expandedRows: [],
       selectedColumns: null,
       WithTrashed: false,
-      data: [],
+      data: null,
     }
   },
-  computed: {
-    optionsColheader() {
-      return R.map(R.path(['header']))(this.columns.concat(this.customCols)).filter(opt => this.SelectedColName.indexOf(opt) === -1)
-    },
-    SelectedColfield() {
-      return R.map(R.path(['field']))(this.columns).filter(opt => this.SelectedColName.indexOf(opt) === -1)
-    },
-  },
+  computed: {},
   watch: {
     selectedRows(newValue) {
       this.$emit('selected-rows', newValue)
@@ -328,7 +339,8 @@ export default {
       this.$emit('selected-row', newValue)
     },
     tableData(newVal) {
-      this.data = newVal.filter(row => row.deleted_at === null)
+      if (this.WithTrashed === false) this.data = this.tableData
+      else this.data = newVal.filter(row => row.deleted_at === null)
     },
     WithTrashed(newVal) {
       if (newVal) this.data = this.tableData.filter(row => row.deleted_at !== null)
@@ -336,7 +348,7 @@ export default {
     },
   },
   created() {
-    this.filterByCol()
+    // this.data = this.tableData
   },
   methods: {
     rowClick(record) {
@@ -354,7 +366,7 @@ export default {
       this.$emit('export-excel')
     },
     onRowExpand(event) {
-      this.expandedRows = this.tableData.filter(p => p[this.dataKey] === event.data[this.dataKey])
+      this.expandedRows = this.data.filter(p => p[this.dataKey] === event.data[this.dataKey])
     },
     onRowCollapse(event) {
       if (event.data) this.expandedRows = null
@@ -365,14 +377,6 @@ export default {
     onRowContextMenu(event) {
       const vm = this
       vm.$refs.cm.show(event.originalEvent)
-    },
-    filterByCol() {
-      this.$root.$on('filterByCol', data => {
-        this.data = data
-      })
-    },
-    log() {
-      console.log('test')
     },
   },
 }
@@ -400,6 +404,13 @@ table .btn.btn-sm.btn-icon, table .btn-group-sm > .btn.btn-icon{
 .p-datatable .p-column-header-content {
   justify-content: center;
 }
+.p-datatable .p-datatable-tbody > tr:focus, .p-datatable .p-datatable-tbody > tr:hover {
+  outline: 1px solid #0f629f;
+  outline-offset: -1px;
+}
+.p-menuitem.p-menuitem-active:hover {
+  outline: 1px solid #0f629f;
+}
 .table-header, .button_actions{
   display: flex;
   flex-direction: row-reverse;
@@ -422,33 +433,3 @@ table .btn.btn-sm.btn-icon, table .btn-group-sm > .btn.btn-icon{
    padding: unset !important;
 }
 </style>
-
-<!--
-:ref="tableName"
-:filters.sync="filters"
-filter-display="menu"
-show-gridlines
-class="p-datatable-hoverable-rows p-datatable-sm"
-:value="data"
-sort-mode="multiple"
-removable-sort
-:selection.sync="selectedRows"
-:data-key="dataKey"
-:paginator="true"
-:rows="5"
-:resizable-columns="true"
-column-resize-mode="fit"
-:loading="isLoading"
-paginator-template="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
-:rows-per-page-options="[5,10,30,100]"
-:current-page-report-template="'Affichage {first} à {last} de {totalRecords} ' + tableName"
-:expanded-rows.sync="expandedRows"
-:row-class="hasDeletedFilter ? FilterDeletedRows : ''"
-context-menu
-:context-menu-selection.sync="selectedRow"
-responsive-layout="stack"
-breakpoint="960px"
-@row-expand="onRowExpand"
-@row-collapse="onRowCollapse"
-@row-click="hasExpansion === true ? rowClick($event) : undefined"
-@row-contextmenu="onRowContextMenu($event)"-->

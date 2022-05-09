@@ -9,31 +9,13 @@
         :table-data="ordinateurs"
         :selected-rows="selectedRows"
         :columns="columns"
-        :isloading="loading"
+        :is-loading="loading"
         :has-actions="false"
         has-deleted-filter
         :menu-options="menuOptions"
+        :actions-buttons="actionsButtons"
         @selected-row=" row => selectedRow = row "
-      >
-        <template #action_table>
-          <b-button
-            variant="gradient-secondary"
-            class="btn-icon rounded-circle mr-1"
-            size="sm"
-            @click="fetchOrdinateurs"
-          >
-            <feather-icon icon="RefreshCwIcon" />
-          </b-button>
-          <b-button
-            variant="gradient-primary"
-            class="btn-icon rounded-circle"
-            size="sm"
-            @click="OpenOrdinateurModal(null)"
-          >
-            <feather-icon icon="PlusIcon" />
-          </b-button>
-        </template>
-      </JDatatable>
+      />
     </b-card>
     <OrdinateurModal />
   </div>
@@ -41,7 +23,7 @@
 
 <script>
 
-import { BButton, BCard } from 'bootstrap-vue'
+import { BCard } from 'bootstrap-vue'
 import { mapGetters } from 'vuex'
 import store from '@/store'
 import OrdinateurModal from '@/views/gestion_pc/ordinateurs/OrdinateurModal'
@@ -51,7 +33,6 @@ import { ConfirmDelete } from '@/libs/sweet-alerts'
 export default {
   name: 'OrdinateursTable',
   components: {
-    BButton,
     BCard,
     OrdinateurModal,
   },
@@ -130,6 +111,10 @@ export default {
           label: 'Restaurer', icon: 'pi pi-fw pi-refresh', command: () => this.restoreOrdinateur(this.selectedRow.id), visible: false,
         },
         { label: 'Supprimer', icon: 'pi pi-fw pi-trash', command: () => this.deleteOrdinateur(this.selectedRow.id) },
+      ],
+      actionsButtons: [
+        { variant: 'gradient-primary', icon: 'PlusIcon', command: () => this.OpenOrdinateurModal() },
+        { variant: 'gradient-secondary', icon: 'RefreshCwIcon', command: () => this.fetchOrdinateurs() },
       ],
     }
   },
