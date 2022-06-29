@@ -54,19 +54,21 @@
             class="button_actions pl-0"
           >
             <slot name="action_table" />
+            <template v-for="(btn, index) of actionsButtons">
+              <b-button
+                v-if="$can(btn.permission ,tableName) || btn.permission === undefined"
+                :key="index"
+                v-b-tooltip.hover.top="btn.tooltip"
+                :variant="btn.variant"
+                class="btn-icon rounded-circle mr-1"
+                size="sm"
+                @click="btn.command"
+              >
+                <feather-icon :icon="btn.icon" />
+              </b-button>
+            </template>
             <b-button
-              v-for="(btn, index) in actionsButtons"
-              :key="index"
-              v-b-tooltip.hover.top="btn.tooltip"
-              :variant="btn.variant"
-              class="btn-icon rounded-circle mr-1"
-              size="sm"
-              @click="btn.command"
-            >
-              <feather-icon :icon="btn.icon" />
-            </b-button>
-            <b-button
-              v-if="hasExport"
+              v-if="hasExport && $can('export', tableName)"
               variant="gradient-success"
               class="btn-icon rounded-circle mr-1"
               size="sm"
@@ -85,7 +87,7 @@
               <feather-icon icon="Trash2Icon" />
             </b-button>
             <b-form-checkbox
-              v-if="hasDeletedFilter"
+              v-if="hasDeletedFilter && $can('trash' ,tableName)"
               v-model="WithTrashed"
               class="custom-control-primary fix_postion"
               name="check-button"
@@ -115,13 +117,12 @@
       />
 
       <Column
-        v-for="col in columns"
-        :key="col.field"
+        v-for="(col, index) of selectedColumns"
+        :key="index"
         v-bind="col"
-        :show-filter-operator="false"
       >
         <template
-          v-if="col.hasComponent"
+          v-if="col && col.hasComponent"
           #body="{data}"
         >
           <component
@@ -134,10 +135,10 @@
           v-else
           #body="{data}"
         >
-          {{ data[col.field] }}
+          <span v-if="col && col.field">{{ data[col.field] }}</span>
         </template>
         <template
-          v-if="col.filtered"
+          v-if="col && col.filtered"
           #filter="{filterModel, filterCallback}"
         >
           <InputText
@@ -180,6 +181,24 @@
         <span v-if="!WithTrashed">Aucun element trouver</span>
         <span v-else>Aucun element supprimer</span>
       </template>
+
+      <template #paginatorend>
+        <el-select
+          v-model="toggledCols"
+          multiple
+          collapse-tags
+          size="small"
+          placeholder="Select Cols"
+          @change="onColToggle"
+        >
+          <el-option
+            v-for="(item, index) of $can('read', 'extraCols') ? columns.concat(AdminCols) : columns"
+            :key="index"
+            :label="item.header"
+            :value="item.field"
+          />
+        </el-select>
+      </template>
     </DataTable>
     <ContextMenu
       v-if="menuOptions"
@@ -192,21 +211,26 @@
 
 <script>
 import {
-  BButton, BFormInput, BCol, BInputGroup, BInputGroupPrepend, BFormCheckbox, VBTooltip,
+  BButton, BFormInput, BCol, BInputGroup, BInputGroupPrepend, BFormCheckbox, VBTooltip, BDropdown,
 } from 'bootstrap-vue'
 import DataTable from 'primevue/datatable'
 import Column from 'primevue/column'
 import InputText from 'primevue/inputtext'
 import ContextMenu from 'primevue/contextmenu'
-
-// import 'primevue/resources/themes/saga-blue/theme.css'
+import { Select, Option } from 'element-ui'
+import lang from 'element-ui/lib/locale/lang/fr'
+import locale from 'element-ui/lib/locale'
+import 'element-ui/lib/theme-chalk/index.css'
+import 'primevue/resources/themes/saga-blue/theme.css'
 // import 'primevue/resources/themes/tailwind-light/theme.css'
-import 'primevue/resources/themes/fluent-light/theme.css'
+// import 'primevue/resources/themes/fluent-light/theme.css'
 import 'primevue/resources/primevue.min.css'
 import 'primeicons/primeicons.css'
 
 // import FilterMatchMode from 'primevue/api/FilterMatchMode'
 // import FilterOperator from 'primevue/api/FilterOperator'
+
+locale.use(lang)
 
 const R = require('ramda')
 
@@ -226,6 +250,9 @@ export default {
     BFormCheckbox,
     ContextMenu,
     InputText,
+    BDropdown,
+    'el-select': Select,
+    'el-option': Option,
   },
   props: {
     actionsButtons: {
@@ -294,12 +321,12 @@ export default {
     hasDeletedFilter: {
       required: false,
       type: Boolean,
-      default: false,
+      default: true,
     },
-    hasFilter: {
+    filtersList: {
       required: false,
-      type: Boolean,
-      default: false,
+      type: Object,
+      default: () => {},
     },
     globalFilterFields: {
       required: false,
@@ -320,17 +347,24 @@ export default {
     return {
       filters: {
         global: { value: null, matchMode: 'contains' },
-        // first_name: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
       },
       selectedRows: [],
       selectedRow: null,
       expandedRows: [],
-      selectedColumns: null,
+      selectedColumns: this.columns,
       WithTrashed: false,
       data: null,
+      AdminCols: [
+        { field: 'created_at', header: 'Date Création', sortable: true },
+        { field: 'created_by', header: 'Créer par', sortable: true },
+        { field: 'updated_at', header: 'Date Modification', sortable: true },
+        { field: 'updated_by', header: 'Modifier par', sortable: true },
+        { field: 'deleted_at', header: 'Date Suppression', sortable: true },
+        { field: 'deleted_by', header: 'Supprimer par', sortable: true },
+      ],
+      toggledCols: [],
     }
   },
-  computed: {},
   watch: {
     selectedRows(newValue) {
       this.$emit('selected-rows', newValue)
@@ -339,8 +373,9 @@ export default {
       this.$emit('selected-row', newValue)
     },
     tableData(newVal) {
-      if (this.WithTrashed === false) this.data = this.tableData
-      else this.data = newVal.filter(row => row.deleted_at === null)
+      this.WithTrashed = newVal.filter(row => row.deleted_at !== null) > 0
+      if (this.hasDeletedFilter) this.data = this.tableData.filter(row => row.deleted_at === null)
+      else this.data = newVal
     },
     WithTrashed(newVal) {
       if (newVal) this.data = this.tableData.filter(row => row.deleted_at !== null)
@@ -348,7 +383,8 @@ export default {
     },
   },
   created() {
-    // this.data = this.tableData
+    this.toggledCols = this.selectedColumns.map(item => item.field)
+    this.filters = { ...this.filters, ...this.filtersList }
   },
   methods: {
     rowClick(record) {
@@ -375,8 +411,28 @@ export default {
       return data.deleted_at !== null ? 'bg-red' : ''
     },
     onRowContextMenu(event) {
+      const restoreOpt = this.menuOptions.find(item => item.label === 'Restaurer')
+      this.menuOptions.forEach(item => {
+        // eslint-disable-next-line no-param-reassign
+        if (item.permission) {
+          // eslint-disable-next-line no-param-reassign
+          item.visible = this.$can(item.permission, this.tableName)
+        }
+      })
+      if (restoreOpt) {
+        restoreOpt.visible = !(this.selectedRow.deleted_at === null) && this.$can('restore', 'laptops')
+      }
       const vm = this
       vm.$refs.cm.show(event.originalEvent)
+    },
+    onColToggle(ColFields) {
+      const allCols = this.$can('read', 'extraCols') ? this.columns.concat(this.AdminCols) : this.columns
+      const findCol = field => allCols.find(item => item.field === field)
+      const tempCols = []
+      ColFields.forEach(item => {
+        tempCols.push(findCol(item))
+      })
+      this.selectedColumns = allCols.filter(col => tempCols.includes(col))
     },
   },
 }
@@ -399,17 +455,24 @@ table .btn.btn-sm.btn-icon, table .btn-group-sm > .btn.btn-icon{
   padding: unset;
 }
 .p-datatable.p-datatable-sm .p-datatable-tbody > tr > td{
-  padding: 4px 5px !important;
+  padding: 0.45rem 0.75rem !important;
+}
+.p-datatable.p-datatable-sm .p-datatable-thead > tr > th {
+  padding: 0.6rem 0.375rem !important;
 }
 .p-datatable .p-column-header-content {
   justify-content: center;
 }
-.p-datatable .p-datatable-tbody > tr:focus, .p-datatable .p-datatable-tbody > tr:hover {
-  outline: 1px solid #0f629f;
-  outline-offset: -1px;
+.p-datatable .p-datatable-tbody > tr:hover {
+  outline: 1px solid #0f629f !important;
+  outline-offset: -1px !important;
+}
+.p-datatable .p-datatable-tbody > tr:focus {
+  outline: 1px solid #3b759f !important;
+  outline-offset: -1px !important;
 }
 .p-menuitem.p-menuitem-active:hover {
-  outline: 1px solid #0f629f;
+  outline: 1px solid #0f629f !important;
 }
 .table-header, .button_actions{
   display: flex;
@@ -431,5 +494,11 @@ table .btn.btn-sm.btn-icon, table .btn-group-sm > .btn.btn-icon{
 }
 .p-column-filter-overlay-menu .p-column-filter-add-rule {
    padding: unset !important;
+}
+.p-column-filter-operator{
+  display: none;
+}
+.p-contextmenu {
+  z-index: 1030 !important
 }
 </style>

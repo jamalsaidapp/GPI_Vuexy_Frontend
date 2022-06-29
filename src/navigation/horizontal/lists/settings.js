@@ -9,7 +9,7 @@ export default [
       },
       {
         title: 'Roles & Permissions',
-        route: 'roles_permission',
+        route: 'roles_permissions',
       },
       {
         title: 'Salaries',

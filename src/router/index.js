@@ -26,7 +26,7 @@ const router = new VueRouter({
     {
       path: '/dashboard',
       name: 'dashboard',
-      component: () => import('@/views/dashboard/dashboard'),
+      component: () => import('@/views/dashboard/index'),
       meta: {
         resource: 'dashboard',
         pageTitle: 'Dashboard',

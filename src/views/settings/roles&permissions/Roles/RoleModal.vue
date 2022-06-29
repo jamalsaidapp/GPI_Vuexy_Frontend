@@ -14,7 +14,7 @@
     >
       <b-form @submit.prevent>
         <b-row class="mt-1">
-          <b-col md="12">
+          <b-col>
             <b-row>
               <b-form-group
                 label="Nom du Role"
@@ -50,10 +50,9 @@
 import {
   BModal, BForm, BRow, BCol, BFormInput, BFormGroup,
 } from 'bootstrap-vue'
-import Form from 'vform'
+import Form from '@core/auth/jwt/vformAxios'
 import { HasError } from 'vform/src/components/bootstrap5'
 import store from '@/store'
-import { toastNotification } from '@/libs/toastification'
 import GroupedPermissions from '@/views/settings/utilisateurs/components/GroupedPermissions'
 
 const R = require('ramda')
@@ -106,20 +105,18 @@ export default {
       this.form.id ? this.editRole() : this.addRole()
     },
     addRole() {
-      store.dispatch('rolesStore/addRole', this.form).then(res => {
+      store.dispatch('rolesStore/addRole', this.form).then(() => {
         this.$nextTick(() => {
           if (this.form.successful) {
-            toastNotification(res.data.msg, 'Role', 'success')
             this.ModalSync = !this.ModalSync
           }
         })
       })
     },
     editRole() {
-      store.dispatch('rolesStore/editRole', this.form).then(res => {
+      store.dispatch('rolesStore/editRole', this.form).then(() => {
         this.$nextTick(() => {
           if (this.form.successful) {
-            toastNotification(res.data.msg, 'Role', 'success')
             this.ModalSync = !this.ModalSync
           }
         })

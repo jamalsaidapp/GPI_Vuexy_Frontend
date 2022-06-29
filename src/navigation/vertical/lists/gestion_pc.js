@@ -5,8 +5,8 @@ export default [
     children: [
       {
         title: 'List des PCs',
-        route: 'ordinateurs',
-        resource: 'ordinateurs',
+        route: 'laptops',
+        resource: 'laptops',
         action: 'read',
       },
       {
@@ -18,7 +18,7 @@ export default [
       {
         title: 'Historique des AFs',
         route: 'historique_pc',
-        resource: 'historique_pc',
+        resource: 'returns_pc',
         action: 'read',
       },
     ],

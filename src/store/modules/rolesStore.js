@@ -28,49 +28,26 @@ export default {
   actions: {
     fetchRoles({ commit }) {
       commit('SET_LOADING_TRUE')
-      return new Promise((resolve, reject) => {
-        axios.get('api/roles')
-          .then(res => {
-            resolve(res)
-            if (res.data) commit('SET_Roles', res.data)
-            commit('SET_LOADING_FALSE')
-          })
-          .catch(error => {
-            reject(error)
-            commit('SET_LOADING_FALSE')
-          })
-      })
+      return axios.get('api/roles')
+        .then(({ data }) => {
+          if (data) commit('SET_Roles', data)
+          commit('SET_LOADING_FALSE')
+        })
+        .catch(() => {
+          commit('SET_LOADING_FALSE')
+        })
     },
-    // eslint-disable-next-line no-unused-vars
     addRole({ dispatch }, form) {
-      return new Promise((resolve, reject) => {
-        form.post('api/roles')
-          .then(res => {
-            resolve(res)
-            if (res.data.msg) dispatch('fetchRoles')
-          })
-          .catch(error => reject(error))
-      })
+      return form.post('api/roles')
+        .then(() => { if (form.successful) dispatch('fetchRoles') })
     },
     editRole({ dispatch }, form) {
-      return new Promise((resolve, reject) => {
-        form.put(`api/roles/${form.id}`)
-          .then(res => {
-            resolve(res)
-            if (res.data.msg) dispatch('fetchRoles')
-          })
-          .catch(error => reject(error))
-      })
+      return form.put(`api/roles/${form.id}`)
+        .then(() => { if (form.successful) dispatch('fetchRoles') })
     },
     deleteRole({ dispatch }, id) {
-      return new Promise((resolve, reject) => {
-        axios.delete(`api/roles/${id}`)
-          .then(res => {
-            resolve(res)
-            if (res.data.msg) dispatch('fetchRoles')
-          })
-          .catch(error => reject(error))
-      })
+      return axios.delete(`api/roles/${id}`)
+        .then(({ status }) => { if (status === 200) dispatch('fetchRoles') })
     },
   },
 }

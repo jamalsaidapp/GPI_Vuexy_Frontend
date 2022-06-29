@@ -48,7 +48,7 @@ export default {
           .then(res => {
             resolve(res)
             if (res.data.msg) dispatch('fetchAffectations')
-            dispatch('ordinateursStore/fetchOrdinateurs', {}, { root: true })
+            dispatch('laptopsStore/fetchLaptops', {}, { root: true })
           })
           .catch(error => reject(error))
       })
@@ -59,7 +59,7 @@ export default {
           .then(res => {
             resolve(res)
             if (res.data.msg) dispatch('fetchAffectations')
-            dispatch('ordinateursStore/fetchOrdinateurs', {}, { root: true })
+            dispatch('laptopsStore/fetchLaptops', {}, { root: true })
           })
           .catch(error => reject(error))
       })
@@ -71,7 +71,18 @@ export default {
           .then(res => {
             resolve(res)
             if (res.data.msg) dispatch('fetchAffectations')
-            dispatch('ordinateursStore/fetchOrdinateurs', {}, { root: true })
+            dispatch('laptopsStore/fetchLaptops', {}, { root: true })
+          })
+          .catch(error => reject(error))
+      })
+    },
+    restoreAffectation({ dispatch }, form) {
+      return new Promise((resolve, reject) => {
+        form.post('api/restore_affectation_pc')
+          .then(res => {
+            resolve(res)
+            if (res.data.msg) dispatch('retoursPcStore/fetchRetours', {}, { root: true })
+            dispatch('laptopsStore/fetchLaptops', {}, { root: true })
           })
           .catch(error => reject(error))
       })

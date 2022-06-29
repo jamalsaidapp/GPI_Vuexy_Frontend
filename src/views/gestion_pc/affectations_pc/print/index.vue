@@ -56,7 +56,7 @@
                 >
                   <label class="text-black">Système Management Qualité</label>
                   <hr>
-                  <label class=" text-black">Fiche d'Affectation Matériel Informatique </label>
+                  <label class=" text-black">Fiche d'affectation Matériel Informatique </label>
                 </td>
                 <td class="text-center text-black">
                   Réf : Pc_S02_FAMI_V01
@@ -205,7 +205,7 @@
             placeholder="Ordinateurs ..."
             label="sn"
             multiple
-            :options="ordinateurs"
+            :options="laptops"
           />
         </b-card>
       </b-col>
@@ -243,10 +243,10 @@ export default {
     }
   },
   computed: {
-    ordinateurs() {
+    laptops() {
       const { data } = this.$route.query
       if (typeof data === 'string' && this.tryParseJSONObject(data)) {
-        return JSON.parse(data).ordinateur
+        return JSON.parse(data).affected_laptops
       }
       return []
     },
@@ -259,8 +259,8 @@ export default {
     },
   },
   async created() {
-    this.selectedPcs = this.ordinateurs
-    this.showError = this.ordinateurs.length === 0
+    this.selectedPcs = this.laptops
+    this.showError = this.laptops.length === 0
   },
   methods: {
     print() {

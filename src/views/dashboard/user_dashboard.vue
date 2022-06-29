@@ -3,7 +3,7 @@
     no-body
     class="p-1"
   >
-    admin dashboard
+    user Dashboard
   </b-card>
 </template>
 
@@ -11,9 +11,22 @@
 import { BCard } from 'bootstrap-vue'
 
 export default {
-  name: 'AdminDashboard',
+  name: 'UserDashboard',
   components: {
     BCard,
+  },
+  data() {
+    return {
+    }
+  },
+  computed: {
+  },
+  created() {
+  },
+  mounted() {
+
+  },
+  methods: {
   },
 }
 </script>

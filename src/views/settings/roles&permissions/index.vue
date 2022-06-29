@@ -1,25 +1,23 @@
 <template>
-  <div>
-    <b-row>
-      <b-col
-        lg="6"
-        md="12"
-      >
+
+  <b-card class="r_p">
+    <b-tabs
+      content-class="mt-1"
+      style="border: 1px solid #c0c4cc;"
+    >
+      <b-tab title="Gestion des Rôles">
         <roles />
-      </b-col>
-      <b-col
-        lg="6"
-        md="12"
-      >
+      </b-tab>
+      <b-tab title="Gestion des Permissions">
         <permissions />
-      </b-col>
-    </b-row>
-  </div>
+      </b-tab>
+    </b-tabs>
+  </b-card>
 </template>
 
 <script>
 import {
-  BRow, BCol,
+  BCard, BTabs, BTab,
 } from 'bootstrap-vue'
 import roles from './Roles/Roles'
 import permissions from './Permissions/Permissions'
@@ -29,8 +27,9 @@ export default {
   components: {
     roles,
     permissions,
-    BRow,
-    BCol,
+    BCard,
+    BTabs,
+    BTab,
   },
   created() {
   },
@@ -38,6 +37,9 @@ export default {
 }
 </script>
 
-<style scoped>
+<style >
+.r_p .nav-tabs {
+  /*margin-bottom: -1.12rem !important;*/
+}
 
 </style>

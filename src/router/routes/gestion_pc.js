@@ -1,14 +1,14 @@
 export default [
   {
-    path: '/gestion_pc/ordinateurs/',
-    name: 'ordinateurs',
-    component: () => import('@/views/gestion_pc/ordinateurs'),
+    path: '/gestion_pc/laptops/',
+    name: 'laptops',
+    component: () => import('@/views/gestion_pc/laptops'),
     meta: {
-      resource: 'ordinateurs',
+      resource: 'laptops',
       pageTitle: 'Gestion PC',
       breadcrumb: [
         {
-          text: 'Mes Ordinateurs ',
+          text: 'Laptops ',
           active: true,
         },
       ],
@@ -34,7 +34,7 @@ export default [
     name: 'historique_pc',
     component: () => import('@/views/gestion_pc/historique_pc'),
     meta: {
-      resource: 'historique_pc',
+      resource: 'returns_pc',
       pageTitle: 'Gestion PC',
       breadcrumb: [
         {
@@ -45,10 +45,22 @@ export default [
     },
   },
   {
-    path: '/print-page',
-    name: 'print-page',
-    component: () => import('@/views/gestion_pc/print/index'),
+    path: '/print-affectation',
+    name: 'print-affectation',
+    component: () => import('@/views/gestion_pc/affectations_pc/print/index'),
     meta: {
+      resource: 'affectations_pc',
+      action: 'print',
+      layout: 'full',
+    },
+  },
+  {
+    path: '/print-retour',
+    name: 'print-retour',
+    component: () => import('@/views/gestion_pc/historique_pc/print/index'),
+    meta: {
+      resource: 'returns_pc',
+      action: 'print',
       layout: 'full',
     },
   },

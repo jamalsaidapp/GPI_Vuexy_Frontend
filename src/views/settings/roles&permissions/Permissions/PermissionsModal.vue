@@ -110,10 +110,9 @@
 import {
   BModal, BForm, BRow, BCol, BFormInput, BFormGroup, BButton,
 } from 'bootstrap-vue'
-import Form from 'vform'
+import Form from '@core/auth/jwt/vformAxios'
 import { HasError } from 'vform/src/components/bootstrap5'
 import store from '@/store'
-import { toastNotification } from '@/libs/toastification'
 
 const R = require('ramda')
 
@@ -129,6 +128,7 @@ export default {
     BFormInput,
     HasError,
   },
+  // eslint-disable-next-line vue/require-prop-types
   props: ['subject'],
   data() {
     return {
@@ -155,7 +155,7 @@ export default {
       this.form.clear()
       this.form.reset()
       this.title = 'Ajouter Une Permission'
-      if (permission.id) {
+      if (permission) {
         this.form.fill(permission)
         this.title = `Modifictaion : ${permission.name}`
       }
@@ -168,20 +168,18 @@ export default {
       this.form.id ? this.editPermission() : this.addPermission()
     },
     addPermission() {
-      store.dispatch('permissionsStore/addPermission', this.form).then(res => {
+      store.dispatch('permissionsStore/addPermission', this.form).then(() => {
         this.$nextTick(() => {
           if (this.form.successful) {
-            toastNotification(res.data.msg, 'Permissions', 'success')
             this.ModalSync = !this.ModalSync
           }
         })
       })
     },
     editPermission() {
-      store.dispatch('permissionsStore/editPermission', this.form).then(res => {
+      store.dispatch('permissionsStore/editPermission', this.form).then(() => {
         this.$nextTick(() => {
           if (this.form.successful) {
-            toastNotification(res.data.msg, 'Permissions', 'success')
             this.ModalSync = !this.ModalSync
           }
         })

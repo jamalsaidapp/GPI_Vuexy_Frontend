@@ -10,10 +10,8 @@
       :is-loading="loading"
       has-export
       has-selection
-      has-deleted-filter
-      :has-actions="false"
+      :filters-list="filters"
       :menu-options="menuOptions"
-      :has-filter="true"
       :actions-buttons="actionsButtons"
       @selected-rows="newValue => selectedRows = newValue"
       @delete-all="ids => deleteUser(ids)"
@@ -43,21 +41,18 @@ export default {
   },
   data() {
     return {
-      tableName: 'userTable',
+      tableName: 'Utilisateurs',
       columns: [
         {
           field: 'id', header: 'ID', sortable: true,
         },
         {
-          field: 'first_name', header: 'Nom', sortable: true, filtered: false,
+          field: 'first_name', header: 'Nom', sortable: true, filtered: true,
         },
         {
           field: 'last_name', header: 'Prénom', sortable: true,
         },
         { field: 'email', header: 'Email', sortable: true },
-        {
-          field: 'created_at', header: 'Date Création', sortable: true,
-        },
         {
           field: 'status', header: 'Status', sortable: true, hasComponent: true, component: CustomCols,
         },
@@ -66,7 +61,9 @@ export default {
         },
       ],
       selectedRows: [],
-      filters: {},
+      filters: {
+        first_name: { operator: 'and', constraints: [{ value: null, matchMode: 'contains' }] },
+      },
       tableData: [],
       selectedRow: null,
       menuOptions: [
@@ -90,10 +87,10 @@ export default {
     }),
   },
   watch: {
-    // eslint-disable-next-line no-unused-vars
-    selectedRow(newValue, oldValue) {
+    selectedRow(newValue) {
       const menu = this.$children[0].$refs.cm
-      if (menu) menu.model[2].visible = !(newValue?.deleted_at === null)
+      const restoreOpt = menu?.model.find(item => item.label === 'Restaurer')
+      if (restoreOpt) restoreOpt.visible = !(newValue?.deleted_at === null)
     },
   },
   async created() {

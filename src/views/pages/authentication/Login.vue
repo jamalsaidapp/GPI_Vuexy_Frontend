@@ -4,10 +4,6 @@
       <!-- Login v1 -->
       <b-card class="mb-0">
         <!-- form -->
-        <small
-          v-if="error"
-          class="text-danger m-auto"
-        > {{ error }}</small>
         <b-form
           class="auth-login-form mt-2"
           @submit.prevent="login"
@@ -116,6 +112,7 @@ import {
 import useJwt from '@/auth/jwt/useJwt'
 import { togglePasswordVisibility } from '@core/mixins/ui/forms'
 import store from '@/store/index'
+// import Form from 'vform'
 import Form from 'vform'
 // import { initialAbility } from '@/libs/acl/config'
 
@@ -148,7 +145,6 @@ export default {
         email: 'said.jamal@nomatis.com',
         password: 'jssjjamalsaid',
       }),
-      error: '',
     }
   },
   computed: {
@@ -178,8 +174,10 @@ export default {
           this.isLogin = false
         })
         .catch(error => {
-          if (error) {
-            this.error = error.response.data.message
+          if (error.response) {
+            this.$toast.error(error.response.data.message)
+          } else {
+            this.$toast.error('Server is Offline')
           }
           this.isLogin = false
         })

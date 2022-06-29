@@ -1,5 +1,6 @@
 import Axios from 'axios'
 import Cookies from 'js-cookie'
+import Vue from 'vue'
 
 // eslint-disable-next-line import/no-cycle
 import router from '@/router'
@@ -45,15 +46,18 @@ export default class JwtService {
 
     // Add request/response interceptor
     this.axiosIns.interceptors.response.use(
-      response => response,
+      response => {
+        const { data } = response
+        if (data.msg) {
+          Vue.$toast.success(data.msg)
+        }
+        return Promise.resolve(response)
+      },
       error => {
         // const { config, response: { status } } = error
-        const { config, response } = error
+        const { response: { status, data } } = error
         // eslint-disable-next-line no-unused-vars
-        const originalRequest = config
-
-        // if (status === 401) {
-        if (response && response.status === 401) {
+        if (status === 401) {
           // if (!this.isAlreadyFetchingAccessToken) {
           //   this.isAlreadyFetchingAccessToken = true
           //   this.refreshToken().then(r => {
@@ -81,6 +85,9 @@ export default class JwtService {
           localStorage.removeItem('userData')
           ability.update(initialAbility)
           router.replace({ name: 'auth-login' }).catch(() => {})
+        }
+        if (status === 403 && data.msg) {
+          return Vue.$toast.error(data.msg)
         }
         return Promise.reject(error)
       },

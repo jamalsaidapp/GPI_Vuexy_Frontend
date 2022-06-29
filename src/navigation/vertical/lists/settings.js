@@ -9,11 +9,19 @@ export default [
       },
       {
         title: 'Roles & Permissions',
-        route: 'roles_permission',
+        route: 'roles_permissions',
       },
       {
         title: 'Salaries',
         route: 'salaries',
+        resource: 'salaries',
+        action: 'read',
+      },
+      {
+        title: 'Projets',
+        route: 'projets',
+        resource: 'projets',
+        action: 'read',
       },
     ],
   },

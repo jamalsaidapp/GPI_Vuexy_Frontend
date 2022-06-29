@@ -216,8 +216,8 @@ export default {
   },
   methods: {
     fetchRoles() {
-      store.dispatch('rolesStore/fetchRoles').then(res => {
-        this.RoleOption = R.pluck('name')(res.data)
+      store.dispatch('rolesStore/fetchRoles').then(data => {
+        this.RoleOption = R.pluck('name')(data)
       })
     },
     submit(bvModalEvt) {
@@ -226,20 +226,18 @@ export default {
       this.form.id ? this.editUser() : this.addUser()
     },
     addUser() {
-      store.dispatch('usersStore/addUser', this.form).then(res => {
+      store.dispatch('usersStore/addUser', this.form).then(() => {
         this.$nextTick(() => {
           if (this.form.successful) {
-            toastNotification(res.data.msg, 'User', 'success')
             this.ModalSync = !this.ModalSync
           }
         })
       })
     },
     editUser() {
-      store.dispatch('usersStore/editUser', this.form).then(res => {
+      store.dispatch('usersStore/editUser', this.form).then(() => {
         this.$nextTick(() => {
           if (this.form.successful) {
-            toastNotification(res.data.msg, 'User', 'success')
             this.ModalSync = !this.ModalSync
           }
         })

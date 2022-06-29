@@ -15,53 +15,37 @@
         <b-row class="mt-1">
           <b-col md="12">
             <b-form-group
-              label="Nom Complete"
-              label-for="full_name"
+              label="Nom Projet"
+              label-for="name"
             >
               <b-form-input
-                id="full_name"
-                v-model="form.full_name"
+                id="name"
+                v-model="form.name"
                 size="sm"
-                placeholder="Tapper Prénom"
-                :state="handleState('full_name')"
-                @input="form.errors.clear('full_name')"
+                placeholder="Tapper Nom Projet"
+                :state="handleState('name')"
+                @input="form.errors.clear('name')"
               />
               <HasError
                 :form="form"
-                field="full_name"
+                field="name"
               />
             </b-form-group>
             <b-form-group
-              label="Affecter un compte"
-              label-for="full_name"
+              label="Code Projet"
+              label-for="code"
             >
               <b-form-input
-                id="cin"
-                v-model="form.cin"
+                id="code"
+                v-model="form.code"
                 size="sm"
-                placeholder="Tapper CIN"
-                :state="handleState('cin')"
-                @input="form.errors.clear('cin')"
+                placeholder="Tapper Code Projet"
+                :state="handleState('code')"
+                @input="form.errors.clear('code')"
               />
               <HasError
                 :form="form"
-                field="cin"
-              />
-            </b-form-group>
-          </b-col>
-          <b-col md="12">
-            <b-form-group
-              label="Affecter un compte"
-              label-for="full_name"
-            >
-              <v-select
-                v-model="form.user_id"
-                placeholder="choisir ..."
-                label="name"
-                :reduce="item => item.id"
-                :options="options"
-                class="select-size-sm"
-                @input="form.is_user = form.user_id !== null"
+                field="code"
               />
             </b-form-group>
           </b-col>
@@ -101,35 +85,28 @@ export default {
       title: '',
       form: new Form({
         id: '',
-        full_name: '',
-        cin: '',
-        is_user: false,
-        user_id: null,
+        name: '',
+        code: '',
       }),
     }
   },
   computed: {
     ...mapGetters({
-      users: 'usersStore/getUsers',
-      loading: 'usersStore/getLoading',
+      users: 'projetsStore/getUsers',
+      loading: 'projetsStore/getLoading',
     }),
-    options() {
-      return this.users.map(user => ({ name: `${user.first_name} ${user.last_name}`, id: user.id }))
-    },
   },
   created() {
-    this.$root.$on('salary-modal-sync', salary => {
+    this.$root.$on('projet-modal-sync', salary => {
       this.ModalSync = !this.ModalSync
       this.form.clear()
       this.form.reset()
-      this.title = 'Ajouter Un Salary'
+      this.title = 'Ajouter Un Projet'
       if (salary) {
         this.form.fill(salary)
-        this.form.is_user = Boolean(this.form.is_user)
-        this.title = `Modification Salary : ${this.form.full_name}`
+        this.title = `Modification Projet : ${this.form.name}`
       }
     })
-    store.dispatch('usersStore/fetchUsers')
   },
   methods: {
     submit(bvModalEvt) {
@@ -139,7 +116,7 @@ export default {
     },
     addOrdinateur() {
       if (this.$can('create', this.tableName)) {
-        store.dispatch('salariesStore/addSalary', this.form).then(() => {
+        store.dispatch('projetsStore/addProjet', this.form).then(() => {
           this.$nextTick(() => {
             if (this.form.successful) {
               this.ModalSync = !this.ModalSync
@@ -150,7 +127,7 @@ export default {
     },
     editOrdinateur() {
       if (this.$can('update', this.tableName)) {
-        store.dispatch('salariesStore/editSalary', this.form).then(() => {
+        store.dispatch('projetsStore/editProjet', this.form).then(() => {
           this.$nextTick(() => {
             if (this.form.successful) {
               this.ModalSync = !this.ModalSync

@@ -44,3 +44,25 @@ input[type="search"]:focus::-webkit-search-cancel-button {
   opacity: .3;
   pointer-events: all;
 }
+
+// Vue Toast CSS
+ .Vue-Toastification__toast {
+    padding: 20px 10px !important;
+}
+
+ .Vue-Toastification__toast {
+    max-height: 20px !important;
+    min-height: 10px !important;
+}
+.Vue-Toastification__close-button {
+  line-height: 3px !important;
+}
+.Vue-Toastification__toast-body{
+  font-size: 14px !important;
+  line-height: 3px !important;
+}
+.Vue-Toastification__icon {
+  position: relative;
+  bottom: 10px;
+}
+

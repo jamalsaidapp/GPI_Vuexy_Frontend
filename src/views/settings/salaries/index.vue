@@ -4,21 +4,17 @@
     class="p-1"
   >
     <JDatatable
-      table-name="Salarie"
+      :table-name="tableName"
       :table-data="salaries"
       :selected-rows="selectedRows"
       :columns="columns"
       :is-loading="loading"
-      has-deleted-filter
-      :has-actions="false"
       :menu-options="menuOptions"
-      :refresh="fetchSalaries"
-      :add-btn="OpenSalarieModal"
       :actions-buttons="actionsButtons"
       @selected-rows="newValue => selectedRows = newValue"
       @selected-row="row => selectedRow = row "
     />
-    <SalarieModal />
+    <SalarieModal :table-name="tableName" />
   </b-card>
 
 </template>
@@ -28,8 +24,7 @@ import { BCard } from 'bootstrap-vue'
 import { mapGetters } from 'vuex'
 import store from '@/store'
 import SalarieModal from '@/views/settings/salaries/SalarieModal'
-import { toastNotification } from '@/libs/toastification'
-import { ConfirmDelete } from '@/libs/sweet-alerts'
+import { ConfirmDelete, ConfirmRestore } from '@/libs/sweet-alerts'
 import xml2js from 'xml2js'
 
 export default {
@@ -40,6 +35,7 @@ export default {
   },
   data() {
     return {
+      tableName: 'salaries',
       columns: [
         {
           field: 'id',
@@ -57,7 +53,7 @@ export default {
           sortable: true,
         },
         {
-          field: 'ordinateurs_count',
+          field: 'affected_laptops_count',
           header: 'N° PC Affecter',
           sortable: true,
         },
@@ -71,31 +67,30 @@ export default {
           header: 'A un compte',
           sortable: true,
         },
-        {
-          field: 'created_by',
-          header: 'Créer Par',
-          sortable: true,
-        },
-        {
-          field: 'updated_by',
-          header: 'Modifier Par',
-          sortable: true,
-        },
+
       ],
       selectedRows: [],
       selectedRow: null,
       menuOptions: [
-        { label: 'Modifier', icon: 'pi pi-fw pi-pencil', command: () => this.OpenSalarieModal(this.selectedRow) },
         {
-          label: 'Restaurer', icon: 'pi pi-fw pi-refresh', command: () => this.restoreSalarie(this.selectedRow.id), visible: false,
+          label: 'Modifier', icon: 'pi pi-fw pi-pencil', command: () => this.OpenSalarieModal(this.selectedRow), permission: 'update',
         },
-        { label: 'Supprimer', icon: 'pi pi-fw pi-trash', command: () => this.deleteSalarie(this.selectedRow.id) },
+        {
+          label: 'Restaurer', icon: 'pi pi-fw pi-refresh', command: () => this.restoreSalarie(this.selectedRow.id), permission: 'restore',
+        },
+        {
+          label: 'Supprimer', icon: 'pi pi-fw pi-trash', command: () => this.deleteSalarie(this.selectedRow.id), permission: 'delete',
+        },
       ],
       actionsButtons: [
-        { variant: 'gradient-primary', icon: 'PlusIcon', command: () => this.OpenSalarieModal() },
-        { variant: 'gradient-secondary', icon: 'RefreshCwIcon', command: () => this.fetchSalaries() },
         {
-          variant: 'outline-warning', icon: 'ArrowDownIcon', command: () => this.exportXML(), tooltip: 'Export Contact (.xml)',
+          variant: 'gradient-primary', icon: 'PlusIcon', command: () => this.OpenSalarieModal(), permission: 'create',
+        },
+        {
+          variant: 'gradient-secondary', icon: 'RefreshCwIcon', command: () => this.fetchSalaries(), permission: 'read',
+        },
+        {
+          variant: 'outline-warning', icon: 'ArrowDownIcon', command: () => this.exportXML(), tooltip: 'Export Contact (.xml)', permission: 'export',
         },
       ],
     }
@@ -105,49 +100,49 @@ export default {
       salaries: 'salariesStore/getSalaries',
       loading: 'salariesStore/getLoading',
     }),
-  },
-  watch: {
-    // eslint-disable-next-line no-unused-vars
-    selectedRow(newValue, oldValue) {
-      const menu = this.$children[0].$refs.cm
-      if (menu) menu.model[1].visible = !(newValue?.deleted_at === null)
-    },
+
   },
   async created() {
     await this.fetchSalaries()
   },
-
   methods: {
     fetchSalaries() {
-      store.dispatch('salariesStore/fetchSalaries')
+      if (this.$can('read', this.tableName)) {
+        store.dispatch('salariesStore/fetchSalaries')
+      }
     },
-    OpenSalarieModal(salarie) {
-      this.$root.$emit('salarie-modal-sync', salarie)
+    OpenSalarieModal(salary) {
+      this.$root.$emit('salary-modal-sync', salary)
     },
     deleteSalarie(id) {
-      ConfirmDelete('salariesStore/deleteSalarie', id)
+      if (this.$can('delete', this.tableName)) {
+        ConfirmDelete('salariesStore/deleteSalary', id)
+      }
     },
     restoreSalarie(id) {
-      store.dispatch('salariesStore/restoreSalarie', id).then(res => {
-        this.$nextTick(() => {
-          if (res.data.msg) {
-            toastNotification(res.data.msg, 'CornerRightUp', 'success')
-          }
-        })
-      })
+      if (this.$can('restore', this.tableName)) {
+        ConfirmRestore('salariesStore/restoreSalary', id)
+      }
     },
     exportXML() {
-      const AddressBook = [{ version: 1 }]
-      this.salaries.filter(item => item.phone_fix !== '***')
-        .map(item => ({ id: item.phone_primary, name: item.full_name, phone: item.phone_fix })).forEach(item => {
-          AddressBook.push(this.serializeContact(item))
-        })
-      const array = { AddressBook }
-      const builder = new xml2js.Builder()
-      const xml = builder.buildObject(array)
-      const date = (new Date()).toLocaleDateString()
-      if (xml) {
-        this.downloadXML(xml, `Contacts_${date}.xml`)
+      if (this.$can('manage', 'all')) {
+        const AddressBook = [{ version: 1 }]
+        this.salaries.filter(item => item.phone_fix !== '***')
+          .map(item => ({
+            id: item.phone_primary,
+            name: item.full_name,
+            phone: item.phone_fix,
+          }))
+          .forEach(item => {
+            AddressBook.push(this.serializeContact(item))
+          })
+        const array = { AddressBook }
+        const builder = new xml2js.Builder()
+        const xml = builder.buildObject(array)
+        const date = (new Date()).toLocaleDateString()
+        if (xml) {
+          this.downloadXML(xml, `Contacts_${date}.xml`)
+        }
       }
     },
     serializeContact(contact) {

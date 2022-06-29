@@ -4,6 +4,21 @@ import VueSweetalert2 from 'vue-sweetalert2'
 import Swal from 'sweetalert2/dist/sweetalert2'
 import store from '@/store'
 
+export const restoreObjData = {
+  title: 'Êtes-vous sûr?',
+  icon: 'warning',
+  showCancelButton: true,
+  confirmButtonText: 'Restaurer !',
+  cancelButtonText: 'Annuler',
+  width: '22rem',
+  customClass: {
+    header: 'delete-header',
+    confirmButton: 'btn btn-sm btn-primary',
+    cancelButton: 'btn btn-sm btn-outline-default ml-1',
+  },
+  buttonsStyling: false,
+}
+
 Vue.use(VueSweetalert2)
 
 // eslint-disable-next-line import/prefer-default-export
@@ -26,18 +41,5 @@ export const ConfirmDelete = (actionsType, data) => {
 
 // eslint-disable-next-line import/prefer-default-export
 export const ConfirmRestore = (actionsType, data) => {
-  Swal.fire({
-    title: 'Êtes-vous sûr?',
-    icon: 'warning',
-    showCancelButton: true,
-    confirmButtonText: 'Restaurer !',
-    cancelButtonText: 'Annuler',
-    width: '22rem',
-    customClass: {
-      header: 'delete-header',
-      confirmButton: 'btn btn-sm btn-primary',
-      cancelButton: 'btn btn-sm btn-outline-default ml-1',
-    },
-    buttonsStyling: false,
-  }).then(result => { if (result.value) store.dispatch(actionsType, data).then(() => {}) })
+  Swal.fire(restoreObjData).then(result => { if (result.value) store.dispatch(actionsType, data).then(() => {}) })
 }

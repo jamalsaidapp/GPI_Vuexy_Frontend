@@ -8,21 +8,21 @@
       <div class="d-sm-flex d-none user-nav">
         <p class="user-name font-weight-bolder mb-0">
           {{
-            userData.first_name + " " + userData.last_name || userData.username
+            authUser.full_name
           }}
         </p>
-        <span class="user-status">{{ userRole }}</span>
+        <span class="user-status">{{ authUser.role }}</span>
       </div>
       <b-avatar
         size="40"
-        :src="userData.avatar"
+        :src="authUser.avatar"
         variant="light-primary"
         badge
         class="badge-minimal"
         badge-variant="success"
       >
         <feather-icon
-          v-if="!userData.username"
+          v-if="!authUser.full_name"
           icon="UserIcon"
           size="22"
         />
@@ -85,10 +85,13 @@ export default {
   },
   data() {
     return {
-      userData: JSON.parse(localStorage.getItem('userData')).user,
-      userRole: JSON.parse(localStorage.getItem('userData')).role,
       avatarText,
     }
+  },
+  computed: {
+    authUser() {
+      return JSON.parse(localStorage.getItem('userData'))
+    },
   },
   methods: {
     logout() {

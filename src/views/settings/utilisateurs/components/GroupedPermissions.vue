@@ -5,7 +5,10 @@
       class="m-auto"
       variant="primary"
     />
-    <div v-else>
+    <div
+      v-else
+      style="width: 100%"
+    >
       <b-row>
         <b-col md="6">
           <b-form-input
@@ -188,10 +191,10 @@ export default {
 .el-tree-node__content {
   display: inline-flex !important;
 }
-.el-tree-node.is-expanded>.el-tree-node__children {
-  display: flex;
-  flex-wrap: wrap;
-}
+/*.el-tree-node.is-expanded > .el-tree-node__children {*/
+/*  display: flex;*/
+/*  flex-wrap: wrap;*/
+/*}*/
 .permission_scrl {
   overflow-y: auto;
   max-height: 300px;
@@ -200,5 +203,17 @@ export default {
 }
 .el-tree__empty-text {
   position: fixed !important;
+}
+
+.el-tree-node.is-expanded:not(:first-child) >.el-tree-node__children{
+  display: flex !important;
+  flex-wrap: wrap;
+  margin: 5px;
+  border: 1px solid #d8dfe4;
+  padding: 2px;
+  width: 471px;
+}
+.el-tree-node__content{
+  padding-left: 10px !important
 }
 </style>

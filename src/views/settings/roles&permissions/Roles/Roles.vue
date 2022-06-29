@@ -5,50 +5,14 @@
       class="p-1"
     >
       <JDatatable
-        table-name="Role"
+        table-name="roles"
         :table-data="roles"
-        :selected-rows="selectedRows"
         :columns="columns"
-        :isloading="loading"
-      >
-        <template #action_table>
-          <b-button
-            variant="gradient-secondary"
-            class="btn-icon rounded-circle mr-1"
-            size="sm"
-            @click="fetchRoles"
-          >
-            <feather-icon icon="RefreshCwIcon" />
-          </b-button>
-          <b-button
-            variant="gradient-primary"
-            class="btn-icon rounded-circle"
-            size="sm"
-            @click="OpenRoleModal(null)"
-          >
-            <feather-icon icon="PlusIcon" />
-          </b-button>
-        </template>
-
-        <template v-slot:actions_button="props">
-          <b-button
-            variant="gradient-success"
-            class="btn-icon rounded-circle mr-1"
-            size="sm"
-            @click="OpenRoleModal(props.props)"
-          >
-            <feather-icon icon="EditIcon" />
-          </b-button>
-          <b-button
-            variant="gradient-danger"
-            class="btn-icon rounded-circle"
-            size="sm"
-            @click="deleteRole(props.props.id)"
-          >
-            <feather-icon icon="Trash2Icon" />
-          </b-button>
-        </template>
-      </JDatatable>
+        :is-loading="loading"
+        :menu-options="menuOptions"
+        :actions-buttons="actionsButtons"
+        @selected-row=" row => selectedRow = row "
+      />
     </b-card>
     <RoleModal :initial-permissions="perms" />
   </div>
@@ -56,7 +20,7 @@
 
 <script>
 import {
-  BButton, BCard,
+  BCard,
 } from 'bootstrap-vue'
 import store from '@/store'
 import { mapGetters } from 'vuex'
@@ -66,7 +30,6 @@ import RoleModal from './RoleModal'
 export default {
   name: 'Index',
   components: {
-    BButton,
     BCard,
     RoleModal,
   },
@@ -83,8 +46,28 @@ export default {
           header: 'Nom',
           sortable: true,
         },
+        {
+          field: 'permissions_count',
+          header: 'Nbr Permissions',
+        },
       ],
-      selectedRows: [],
+      selectedRow: null,
+      menuOptions: [
+        {
+          label: 'Modifier', icon: 'pi pi-fw pi-pencil', command: () => this.OpenRoleModal(this.selectedRow), perms: this.$can('update', 'roles'),
+        },
+        {
+          label: 'Supprimer', icon: 'pi pi-fw pi-trash', command: () => this.deleteRole(this.selectedRow.id), perms: this.$can('delete', 'roles'),
+        },
+      ],
+      actionsButtons: [
+        {
+          variant: 'gradient-primary', icon: 'PlusIcon', command: () => this.OpenRoleModal(), perms: this.$can('create', 'roles'),
+        },
+        {
+          variant: 'gradient-secondary', icon: 'RefreshCwIcon', command: () => this.fetchRoles(),
+        },
+      ],
     }
   },
   computed: {

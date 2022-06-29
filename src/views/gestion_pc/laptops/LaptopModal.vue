@@ -1,7 +1,7 @@
 <template>
   <div>
     <b-modal
-      ref="OrdinateurModal"
+      ref="LaptopModal"
       v-model="ModalSync"
       :title="title"
       centered
@@ -203,14 +203,13 @@ import {
 } from 'bootstrap-vue'
 import { HasError } from 'vform/src/components/bootstrap5'
 import store from '@/store'
-import Form from 'vform'
-import { toastNotification } from '@/libs/toastification'
+import Form from '@core/auth/jwt/vformAxios'
 import {
   $Marques, $Processors, $Ram, $Disk, $States,
-} from './OrdinateurConfig'
+} from './LaptopConfig'
 
 export default {
-  name: 'OrdinateurModal',
+  name: 'LaptopModal',
   components: {
     BModal,
     BForm,
@@ -219,6 +218,10 @@ export default {
     BFormGroup,
     BFormInput,
     HasError,
+  },
+  props: {
+    // eslint-disable-next-line vue/require-default-prop
+    tableName: String,
   },
   data() {
     return {
@@ -244,26 +247,29 @@ export default {
     }
   },
   created() {
-    this.$root.$on('ordinateur-modal-sync', ordinateur => {
+    this.$root.$on('laptop-modal-sync', laptop => {
       this.ModalSync = !this.ModalSync
       this.form.clear()
       this.form.reset()
-      this.title = 'Ajouter Un Ordinateur'
-      if (ordinateur) {
-        this.form.fill(ordinateur)
+      this.title = 'Ajouter Un Laptop'
+      if (laptop) {
+        this.form.fill(laptop)
         this.title = `Modification : ${this.form.marque} ${this.form.reference}`
       }
     })
-    this.$root.$on('duplicate-row', ordinateur => {
+    this.$root.$on('duplicate-row', laptop => {
       this.ModalSync = !this.ModalSync
       this.form.clear()
       this.form.reset()
-      this.title = 'Ajouter Un Ordinateur'
-      if (ordinateur) {
-        delete ordinateur.id
-        delete ordinateur.sn
-        delete ordinateur.remarque
-        this.form.fill(ordinateur)
+      this.title = 'Ajouter Un Laptop'
+      if (laptop) {
+        // eslint-disable-next-line no-param-reassign
+        delete laptop.id
+        // eslint-disable-next-line no-param-reassign
+        delete laptop.sn
+        // eslint-disable-next-line no-param-reassign
+        delete laptop.remarque
+        this.form.fill(laptop)
       }
     })
   },
@@ -271,27 +277,29 @@ export default {
     submit(bvModalEvt) {
       bvModalEvt.preventDefault()
       // eslint-disable-next-line no-unused-expressions
-      this.form.id ? this.editOrdinateur() : this.addOrdinateur()
+      this.form.id ? this.editLaptop() : this.addLaptop()
     },
-    addOrdinateur() {
-      store.dispatch('ordinateursStore/addOrdinateur', this.form).then(res => {
-        this.$nextTick(() => {
-          if (this.form.successful) {
-            toastNotification(res.data.msg, 'Ordinateur', 'success')
-            this.ModalSync = !this.ModalSync
-          }
+    addLaptop() {
+      if (this.$can('create', this.tableName)) {
+        store.dispatch('laptopsStore/addLaptop', this.form).then(() => {
+          this.$nextTick(() => {
+            if (this.form.successful) {
+              this.ModalSync = !this.ModalSync
+            }
+          })
         })
-      })
+      }
     },
-    editOrdinateur() {
-      store.dispatch('ordinateursStore  /editOrdinateur', this.form).then(res => {
-        this.$nextTick(() => {
-          if (this.form.successful) {
-            toastNotification(res.data.msg, 'Ordinateur', 'success')
-            this.ModalSync = !this.ModalSync
-          }
+    editLaptop() {
+      if (this.$can('create', this.tableName)) {
+        store.dispatch('laptopsStore/editLaptop', this.form).then(() => {
+          this.$nextTick(() => {
+            if (this.form.successful) {
+              this.ModalSync = !this.ModalSync
+            }
+          })
         })
-      })
+      }
     },
     handleState(field) {
       return this.form.errors.has(field) ? false : null

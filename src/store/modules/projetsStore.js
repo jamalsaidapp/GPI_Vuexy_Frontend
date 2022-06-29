@@ -28,59 +28,31 @@ export default {
   actions: {
     fetchProjets({ commit }) {
       commit('SET_LOADING_TRUE')
-      return new Promise((resolve, reject) => {
-        axios.get('api/projets')
-          .then(res => {
-            resolve(res)
-            if (res.data) commit('SET_Projets', res.data)
-            commit('SET_LOADING_FALSE')
-          })
-          .catch(error => {
-            reject(error)
-            commit('SET_LOADING_FALSE')
-          })
-      })
+      return axios.get('api/projets')
+        .then(({ data }) => {
+          if (data) commit('SET_Projets', data)
+          commit('SET_LOADING_FALSE')
+        })
+        .catch(() => {
+          commit('SET_LOADING_FALSE')
+        })
     },
     // eslint-disable-next-line no-unused-vars
     addProjet({ dispatch }, form) {
-      return new Promise((resolve, reject) => {
-        form.post('api/projets')
-          .then(res => {
-            resolve(res)
-            if (res.data.msg) dispatch('fetchProjets')
-          })
-          .catch(error => reject(error))
-      })
+      return form.post('api/projets')
+        .then(() => { if (form.successful) dispatch('fetchProjets') })
     },
     editProjet({ dispatch }, form) {
-      return new Promise((resolve, reject) => {
-        form.put(`api/projets/${form.id}`)
-          .then(res => {
-            resolve(res)
-            if (res.data.msg) dispatch('fetchProjets')
-          })
-          .catch(error => reject(error))
-      })
+      return form.put(`api/projets/${form.id}`)
+        .then(() => { if (form.successful) dispatch('fetchProjets') })
     },
     deleteProjet({ dispatch }, id) {
-      return new Promise((resolve, reject) => {
-        axios.delete(`api/projets/${id}`)
-          .then(res => {
-            resolve(res)
-            if (res.data.msg) dispatch('fetchProjets')
-          })
-          .catch(error => reject(error))
-      })
+      return axios.delete(`api/projets/${id}`)
+        .then(({ status }) => { if (status === 200) dispatch('fetchProjets') })
     },
     restoreProjet({ dispatch }, id) {
-      return new Promise((resolve, reject) => {
-        axios.post(`api/restore_ordinateur/${id}`)
-          .then(res => {
-            resolve(res)
-            if (res.data.msg) dispatch('fetchProjets')
-          })
-          .catch(error => reject(error))
-      })
+      return axios.post(`api/restore_ordinateur/${id}`)
+        .then(({ status }) => { if (status === 200) dispatch('fetchProjets') })
     },
   },
 }

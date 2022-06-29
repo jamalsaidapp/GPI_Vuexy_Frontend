@@ -5,49 +5,14 @@
       class="p-1"
     >
       <JDatatable
-        table-name="Permission"
+        table-name="permissions"
         :table-data="permissions"
-        :selected-rows="selectedRows"
         :columns="columns"
-        :isloading="loading"
-      >
-        <template #action_table>
-          <b-button
-            variant="gradient-secondary"
-            class="btn-icon rounded-circle mr-1"
-            size="sm"
-            @click="fetchPermissions"
-          >
-            <feather-icon icon="RefreshCwIcon" />
-          </b-button>
-          <b-button
-            variant="gradient-primary"
-            class="btn-icon rounded-circle"
-            size="sm"
-            @click="OpenPermissionModal"
-          >
-            <feather-icon icon="PlusIcon" />
-          </b-button>
-        </template>
-        <template v-slot:actions_button="data">
-          <b-button
-            variant="gradient-success"
-            class="btn-icon rounded-circle mr-1"
-            size="sm"
-            @click="OpenPermissionModal(data.props)"
-          >
-            <feather-icon icon="EditIcon" />
-          </b-button>
-          <b-button
-            variant="gradient-danger"
-            class="btn-icon rounded-circle"
-            size="sm"
-            @click="log(data.props.id)"
-          >
-            <feather-icon icon="Trash2Icon" />
-          </b-button>
-        </template>
-      </JDatatable>
+        :is-loading="loading"
+        :menu-options="menuOptions"
+        :actions-buttons="actionsButtons"
+        @selected-row=" row => selectedRow = row "
+      />
     </b-card>
     <PermissionsModal :subject="Subject" />
   </div>
@@ -55,7 +20,7 @@
 
 <script>
 import {
-  BButton, BCard,
+  BCard,
 } from 'bootstrap-vue'
 import store from '@/store'
 import { mapGetters } from 'vuex'
@@ -66,7 +31,6 @@ const R = require('ramda')
 export default {
   name: 'Index',
   components: {
-    BButton,
     BCard,
     PermissionsModal,
   },
@@ -94,7 +58,23 @@ export default {
           sortable: true,
         },
       ],
-      selectedRows: [],
+      selectedRow: null,
+      menuOptions: [
+        {
+          label: 'Modifier', icon: 'pi pi-fw pi-pencil', command: () => this.OpenPermissionModal(this.selectedRow), perms: this.$can('update', 'permissions'),
+        },
+        {
+          label: 'Supprimer', icon: 'pi pi-fw pi-trash', command: () => this.deletePermissions(this.selectedRow.id), perms: this.$can('delete', 'roles'),
+        },
+      ],
+      actionsButtons: [
+        {
+          variant: 'gradient-primary', icon: 'PlusIcon', command: () => this.OpenPermissionModal(), perms: this.$can('create', 'permissions'),
+        },
+        {
+          variant: 'gradient-secondary', icon: 'RefreshCwIcon', command: () => this.fetchPermissions(),
+        },
+      ],
       Subject: [],
     }
   },
@@ -114,11 +94,11 @@ export default {
         this.Subject = R.pluck('subject')(this.permissions)
       })
     },
-    log(val) {
-      console.log(val)
+    OpenPermissionModal(data) {
+      this.$root.$emit('permissions-modal', data)
     },
-    OpenPermissionModal(permission) {
-      this.$root.$emit('permissions-modal', permission)
+    deletePermissions(val) {
+      console.log(val)
     },
   },
 }

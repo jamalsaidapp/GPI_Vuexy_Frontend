@@ -28,66 +28,34 @@ export default {
   actions: {
     fetchSalaries({ commit }) {
       commit('SET_LOADING_TRUE')
-      return new Promise((resolve, reject) => axios.get('api/salaries')
+      return axios.get('api/salaries')
         .then(res => {
-          resolve(res)
-          if (res.data) commit('SET_Salaries', res.data)
-          commit('SET_LOADING_FALSE')
+          if (res.data) {
+            commit('SET_Salaries', res.data)
+            commit('SET_LOADING_FALSE')
+          }
         })
-        .catch(error => {
-          reject(error)
-          commit('SET_LOADING_FALSE')
-        }))
+        .catch(() => { commit('SET_LOADING_FALSE') })
     },
     // eslint-disable-next-line no-unused-vars
-    addSalarie({ dispatch }, form) {
-      return new Promise((resolve, reject) => {
-        form.post('api/salaries')
-          .then(res => {
-            resolve(res)
-            if (res.data.msg) dispatch('fetchSalaries')
-          })
-          .catch(error => reject(error))
-      })
+    addSalary({ dispatch }, form) {
+      return form.post('api/salaries')
+        .then(() => { if (form.successful) dispatch('fetchSalaries') })
     },
-    editSalarie({ dispatch }, form) {
-      return new Promise((resolve, reject) => {
-        form.put(`api/salaries/${form.id}`)
-          .then(res => {
-            resolve(res)
-            if (res.data.msg) dispatch('fetchSalaries')
-          })
-          .catch(error => reject(error))
-      })
+    editSalary({ dispatch }, form) {
+      return form.put(`api/salaries/${form.id}`)
+        .then(() => { if (form.successful) dispatch('fetchSalaries') })
     },
-    deleteSalarie({ dispatch }, id) {
-      return new Promise((resolve, reject) => {
-        axios.delete(`api/salaries/${id}`)
-          .then(res => {
-            resolve(res)
-            if (res.data.msg) dispatch('fetchSalaries')
-          })
-          .catch(error => reject(error))
-      })
+    deleteSalary({ dispatch }, id) {
+      return axios.delete(`api/salaries/${id}`)
+        .then(({ status }) => { if (status === 200) dispatch('fetchSalaries') })
     },
-    restoreSalarie({ dispatch }, id) {
-      return new Promise((resolve, reject) => {
-        axios.post(`api/restore_salarie/${id}`)
-          .then(res => {
-            resolve(res)
-            if (res.data.msg) dispatch('fetchSalaries')
-          })
-          .catch(error => reject(error))
-      })
+    restoreSalary({ dispatch }, id) {
+      return axios.post(`api/restore_salary/${id}`)
+        .then(({ status }) => { if (status === 200) dispatch('fetchSalaries') })
     },
     get_SN_Salaries() {
-      return new Promise((resolve, reject) => axios.get('api/get_sn_salaries')
-        .then(res => {
-          resolve(res)
-        })
-        .catch(error => {
-          reject(error)
-        }))
+      return axios.get('api/get_sn_salaries')
     },
   },
 }
